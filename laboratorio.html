@@ -61,16 +61,38 @@ th{text-align:left;padding:12px 16px;background:var(--teal);color:#fff}td{paddin
 .avl{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
 .avl li{background:var(--paper);border:1px solid var(--line);border-left:5px solid var(--amber);padding:14px 18px;font-size:16.5px}.avl b{display:block}
 footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);font-size:15px;color:var(--mute);max-width:110ch}
-@media(max-width:900px){.shell{display:block;padding:0 18px}nav{display:none}.grid3,.kpis,.rules,.avl{grid-template-columns:1fr}header{padding:28px 22px}}
+@media(max-width:900px){.shell{display:block;padding:0 18px}.grid3,.kpis,.rules,.avl{grid-template-columns:1fr}header{padding:28px 22px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+.menu-btn,.nav-bg{display:none}
+@media(max-width:900px){
+button.menu-btn{display:flex;position:fixed;top:12px;right:12px;z-index:40;width:48px;height:48px;padding:0;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#fff;border:2px solid var(--teal);border-radius:12px;box-shadow:0 4px 14px rgba(0,40,70,.25);cursor:pointer}
+button.menu-btn:hover{background:var(--teal-l)}
+.menu-btn i{display:block;width:22px;height:3px;background:var(--ink);border-radius:2px;transition:transform .25s,opacity .2s}
+.menu-btn.open i:nth-child(1){transform:translateY(9px) rotate(45deg)}
+.menu-btn.open i:nth-child(2){opacity:0}
+.menu-btn.open i:nth-child(3){transform:translateY(-9px) rotate(-45deg)}
+nav{display:block;position:fixed;top:0;right:0;left:auto;z-index:30;width:min(84vw,330px);height:100%;height:100dvh;padding:76px 22px 30px;background:#fff;overflow-y:auto;box-shadow:-8px 0 30px rgba(0,40,70,.25);transform:translateX(105%);visibility:hidden;transition:transform .25s,visibility 0s .25s}
+nav.open{transform:none;visibility:visible;transition:transform .25s}
+nav a{padding:12px 0 12px 14px}
+.nav-bg{display:block;position:fixed;inset:0;z-index:25;background:rgba(5,25,35,.5);opacity:0;pointer-events:none;transition:opacity .25s}
+.nav-bg.open{opacity:1;pointer-events:auto}
+body.noscroll{overflow:hidden}
+.ctl{padding-right:70px}
+}
+@media(prefers-reduced-motion:reduce){nav,.nav-bg,.menu-btn i{transition:none}}
+@media print{.menu-btn,.nav-bg{display:none!important}}
 </style>
 </head>
 <body>
+<button class="menu-btn" id="menuBtn" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu"><i></i><i></i><i></i></button>
+<div class="nav-bg" id="navBg"></div>
 <div class="shell">
-<nav aria-label="Seções">
+<nav id="menu" aria-label="Seções">
 <b>Laboratório 10 minutos</b>
 <a href="https://jmelo2023.github.io/mercado/">HOME</a>
 <a href="https://jmelo2023.github.io/mercado/daytrade.html">DAY TRADE</a>
+Atalhos
 <a href="#base">1. Configuração e leitura</a>
 <a href="#tendencia">2. Tendência</a>
 <a href="#lateral">3. Lateralização</a>
@@ -139,8 +161,8 @@ footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);font-si
 </ul>
 <div class="group">Checklist antes de cada entrada<small>A marcação não é salva.</small></div>
 <ul class="check" id="chk"></ul>
-<footer><h3>Material educacional. Os preços são sintéticos e os exemplos não representam resultados reais, nem recomendação de compra ou venda. Day trade com derivativos envolve risco elevado de perda. Use os indicadores como apoio, junto com gestão de risco e contexto de mercado.</footer>
-</h3></section>
+<footer><h3>Material educacional. Os preços são sintéticos e os exemplos não representam resultados reais, nem recomendação de compra ou venda. Day trade com derivativos envolve risco elevado de perda. Use os indicadores como apoio, junto com gestão de risco e contexto de mercado.</h3></footer>
+</section>
 </main>
 </div>
 
@@ -191,28 +213,28 @@ const fmt=n=>Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,".");
 const RGC={up:"#7FD9CD",dn:"#F5A29B",lat:"#C5D3E8",sq:"#F5C45A"};
 function draw(S){
  const D=S.D,x0=64,pw=930,st=pw/N,X=i=>x0+(i+.5)*st;
- const vals=[...D.h,...D.l,...(OPT.bb?[...D.up,...D.lo]:[])],mn=Math.min(...vals),mx=Math.max(...vals),Y=v=>16+(mx-v)/(mx-mn)*296;
+ const vals=[...D.h,...D.l,...(OPT.bb?[...D.up,...D.lo]:[])],mn=Math.min(...vals),mx=Math.max(...vals),Y=v=>72+(mx-v)/(mx-mn)*224;
  let g="";
  for(let k=0;k<=4;k++){const v=mn+(mx-mn)*k/4;g+=`<line x1="${x0}" x2="994" y1="${Y(v)}" y2="${Y(v)}" stroke="#DDEBE8"/><text x="${x0-6}" y="${Y(v)+4}" font-size="12" text-anchor="end" fill="#41575B">${fmt(v)}</text>`}
- for(let i=0;i<N;i+=6){g+=`<line x1="${X(i)-st/2}" x2="${X(i)-st/2}" y1="16" y2="470" stroke="#EDF5F3"/><text x="${X(i)-st/2+3}" y="486" font-size="12" fill="#41575B">${String(9+i/6).padStart(2,"0")}:00</text>`}
- (S.zn||[]).forEach(z=>{if(OPT.mk)g+=`<rect x="${X(z.a)-st/2}" y="16" width="${(z.b-z.a+1)*st}" height="296" fill="${z.c}" opacity=".10"/><text x="${X(z.a)-st/2+6}" y="32" font-size="13" font-weight="600" fill="#41575B">${z.l}</text>`});
+ for(let i=0;i<N;i+=6){g+=`<line x1="${X(i)-st/2}" x2="${X(i)-st/2}" y1="16" y2="510" stroke="#EDF5F3"/><text x="${X(i)-st/2+3}" y="526" font-size="12" fill="#41575B">${String(9+i/6).padStart(2,"0")}:00</text>`}
+ (S.zn||[]).forEach(z=>{if(OPT.mk)g+=`<rect x="${X(z.a)-st/2}" y="16" width="${(z.b-z.a+1)*st}" height="336" fill="${z.c}" opacity=".10"/><text x="${X(z.a)-st/2+6}" y="32" font-size="13" font-weight="600" fill="#41575B">${z.l}</text>`});
  const P=a=>a.map((v,i)=>(i?"L":"M")+X(i).toFixed(1)+" "+Y(v).toFixed(1)).join("");
  if(OPT.bb){g+=`<path d="${P(D.up)}L${D.lo.map((v,i)=>[v,i]).reverse().map(a=>X(a[1]).toFixed(1)+" "+Y(a[0]).toFixed(1)).join("L")}Z" fill="#1565E0" opacity=".08"/><path d="${P(D.up)}" fill="none" stroke="#1565E0" stroke-width="1.4"/><path d="${P(D.lo)}" fill="none" stroke="#1565E0" stroke-width="1.4"/>`}
  if(OPT.m20)g+=`<path d="${P(D.m)}" fill="none" stroke="#1565E0" stroke-width="1.4" stroke-dasharray="5 4"/>`;
  for(let i=0;i<N;i++){const u=D.c[i]>=D.o[i],c=u?"#00857A":"#E5342A",top=Y(Math.max(D.o[i],D.c[i])),h=Math.max(1.5,Math.abs(Y(D.o[i])-Y(D.c[i])));
   g+=`<line x1="${X(i)}" x2="${X(i)}" y1="${Y(D.h[i])}" y2="${Y(D.l[i])}" stroke="${c}" stroke-width="1.3"/><rect x="${X(i)-st*.3}" y="${top}" width="${st*.6}" height="${h}" fill="${c}"/>`}
  if(OPT.e9)g+=`<path d="${P(D.e9)}" fill="none" stroke="#F59E0B" stroke-width="2.4"/>`;
- if(OPT.mk)S.F.forEach((m,n)=>{const i=m.i,isTop=m.t=="sell"||(m.t=="avoid"&&m.up)||(m.t=="info"&&m.up);const y=isTop?Y(D.h[i])-24:Y(D.l[i])+24,y1=isTop?Y(D.h[i])-3:Y(D.l[i])+3;
+ if(OPT.mk)S.F.forEach((m,n)=>{const i=m.i,isTop=m.t=="sell"||(m.t=="avoid"&&m.up)||!!(m.t=="info"&&m.up),sk=S.F.slice(0,n).filter(q=>Math.abs(q.i-i)<=2&&(!!(q.t=="sell"||q.up)==isTop)).length*26;const y=isTop?Y(D.h[i])-24-sk:Y(D.l[i])+24+sk,y1=isTop?Y(D.h[i])-3:Y(D.l[i])+3;
   const col={buy:"#00857A",sell:"#E5342A",avoid:"#F59E0B",info:"#1565E0"}[m.t],x=X(i);
   g+=`<line x1="${x}" x2="${x}" y1="${y1}" y2="${y}" stroke="${col}" stroke-width="1.5"/>`;
   g+=m.t=="avoid"?`<rect x="${x-10}" y="${y-10}" width="20" height="20" fill="${col}" transform="rotate(45 ${x} ${y})"/>`:m.t=="info"?`<rect x="${x-11}" y="${y-11}" width="22" height="22" rx="3" fill="${col}"/>`:`<circle cx="${x}" cy="${y}" r="12" fill="${col}"/>`;
   g+=`<text x="${x}" y="${y+5}" font-size="14" font-weight="700" text-anchor="middle" fill="${m.t=="avoid"?"#0B1F24":"#fff"}">${n+1}</text>`});
- if(OPT.rg)D.rg.forEach((k,i)=>{g+=`<rect x="${X(i)-st/2}" y="318" width="${st}" height="12" fill="${RGC[k]}"/>`});
- if(OPT.mc){const a=[...D.mc,...D.sg,...D.hs],lo=Math.min(...a),hi=Math.max(...a),YM=v=>350+(hi-v)/(hi-lo)*110;
-  g+=`<line x1="${x0}" x2="994" y1="${YM(0)}" y2="${YM(0)}" stroke="#B5D8D2"/><text x="${x0-6}" y="${YM(0)+4}" font-size="12" text-anchor="end" fill="#41575B">0</text><text x="${x0}" y="344" font-size="12" font-weight="600" fill="#41575B">MACD (12, 26, 9)</text>`;
+ if(OPT.rg)D.rg.forEach((k,i)=>{g+=`<rect x="${X(i)-st/2}" y="358" width="${st}" height="12" fill="${RGC[k]}"/>`});
+ if(OPT.mc){const a=[...D.mc,...D.sg,...D.hs],lo=Math.min(...a),hi=Math.max(...a),YM=v=>390+(hi-v)/(hi-lo)*110;
+  g+=`<line x1="${x0}" x2="994" y1="${YM(0)}" y2="${YM(0)}" stroke="#B5D8D2"/><text x="${x0-6}" y="${YM(0)+4}" font-size="12" text-anchor="end" fill="#41575B">0</text><text x="${x0}" y="384" font-size="12" font-weight="600" fill="#41575B">MACD (12, 26, 9)</text>`;
   D.hs.forEach((v,i)=>{g+=`<rect x="${X(i)-st*.3}" y="${Math.min(YM(0),YM(v))}" width="${st*.6}" height="${Math.max(.5,Math.abs(YM(v)-YM(0)))}" fill="${v>=0?"#00857A":"#E5342A"}" opacity=".45"/>`});
   g+=`<path d="${D.mc.map((v,i)=>(i?"L":"M")+X(i).toFixed(1)+" "+YM(v).toFixed(1)).join("")}" fill="none" stroke="#00857A" stroke-width="2"/><path d="${D.sg.map((v,i)=>(i?"L":"M")+X(i).toFixed(1)+" "+YM(v).toFixed(1)).join("")}" fill="none" stroke="#E5342A" stroke-width="2"/>`}
- return`<svg viewBox="0 0 1000 494" role="img" aria-label="${S.title}">${g}</svg>`}
+ return`<svg viewBox="0 0 1000 534" role="img" aria-label="${S.title}">${g}</svg>`}
 
 /* ---------- Cenários ---------- */
 const WP1=[[-40,128000,22],[8,128010,22],[16,128260,28],[20,128190,22],[28,128470,30],[33,128370,24],[43,128700,34],[47,128610,26],[53,128780,28]];
@@ -234,19 +256,19 @@ const SC=[
  {t:"avoid",r:"belowL",w:[38,46],x:"Evitar vender: candle esticado fechando fora da banda inferior, longe da MA9. Repiques costumam ser fortes nesse ponto."}],
  ctx:"Preço abaixo da média 20 inclinada para baixo, MACD abaixo de zero, histograma negativo.",gat:"Candle que toca a MA9 e fecha abaixo dela, em baixa.",stp:"Stop acima da máxima do repique. Alvo no fundo anterior ou 1,5 a 2 vezes o risco.",inv:"Fechamento acima da média 20 com histograma do MACD cruzando para cima."},
 {id:"s3",g:"g-lat",seed:5,title:"Lateralização: intervalo entre suporte e resistência",
- wp:[[-40,128250,16],[-36,128340,16],[-30,128165,16],[-24,128335,16],[-18,128170,16],[-12,128330,16],[-6,128175,16],[0,128250,14],[4,128340,16],[10,128160,16],[16,128340,16],[22,128165,16],[27,128250,14],[31,128335,16],[37,128170,16],[42,128260,14],[46,128340,16],[50,128170,16],[53,128250,16]],
+ wp:[[-40,128250,20],[-35,128345,22],[-29,128160,20],[-23,128330,22],[-17,128175,20],[-11,128350,22],[-5,128170,20],[0,128250,18],[4,128340,22],[10,128155,22],[16,128350,22],[22,128170,20],[27,128255,16],[31,128335,20],[36,128185,18],[40,128255,12],[44,128225,10],[47,128270,10],[50,128235,10],[53,128252,10]],
  lead:"Bandas paralelas, média 20 plana e preço oscilando entre dois extremos. O MACD cruza a linha zero várias vezes sem sustentar direção.",
- mk:[{t:"sell",up:1,r:"touchU",w:[3,8],x:"Venda na rejeição da banda superior, com alvo na média 20."},
- {t:"buy",r:"touchL",w:[8,13],x:"Compra na rejeição da banda inferior, com alvo na média 20."},
+ mk:[{t:"sell",up:1,r:"touchU",w:[3,8],x:"Venda na rejeição do topo do intervalo, junto à banda superior, com alvo na média 20."},
+ {t:"buy",r:"touchL",w:[8,13],x:"Compra na rejeição do fundo do intervalo, junto à banda inferior, com alvo na média 20."},
  {t:"sell",up:1,r:"touchU",w:[14,19],x:"Nova venda no topo do intervalo. O padrão se repete até o rompimento."},
  {t:"avoid",up:1,r:"crossE9",w:[24,30],x:"Evitar: cruzamento da MA9 no meio do intervalo. O preço atravessa a média várias vezes e gera stops seguidos."},
- {t:"buy",r:"touchL",w:[34,40],x:"Compra no fundo do intervalo, com stop abaixo da mínima do candle."},
- {t:"avoid",r:"macdX",w:[40,46],x:"Evitar: cruzamento do MACD perto da linha zero com histograma minúsculo. É ruído, não sinal."}],
- ctx:"Média 20 plana, bandas paralelas, MACD oscilando em torno de zero. Comum na janela do almoço e em dias sem catalisador.",gat:"Rejeição na banda externa: candle toca a banda e o seguinte fecha de volta para dentro.",stp:"Stop além do extremo do candle. Alvo na média 20, com parcial na metade do caminho.",inv:"Fechamento fora da banda com histograma do MACD acelerando: o intervalo acabou e é tendência."},
+ {t:"buy",r:"touchL",w:[33,39],x:"Compra no fundo do intervalo, com stop abaixo da mínima do candle."},
+ {t:"avoid",r:"macdX",w:[41,50],x:"Evitar: com o intervalo se estreitando, o MACD cruza o sinal colado na linha zero, com histograma minúsculo. É ruído, não sinal."}],
+ ctx:"Média 20 plana, bandas paralelas, MACD oscilando em torno de zero. Comum na janela do almoço e em dias sem catalisador.",gat:"Rejeição no extremo do intervalo, junto à banda externa: candle chega perto da banda e o seguinte fecha de volta para dentro.",stp:"Stop além do extremo do candle. Alvo na média 20, com parcial na metade do caminho.",inv:"Fechamento fora da banda com histograma do MACD acelerando: o intervalo acabou e é tendência."},
 {id:"s4",g:"g-comp",seed:8,title:"Compressão e rompimento verdadeiro",
  wp:[...SQ,[26,128140,26],[30,128260,30],[34,128215,24],[44,128470,32],[48,128430,26],[53,128540,28]],
  lead:"As bandas estreitam, o histograma do MACD fica perto de zero e o preço se comprime. O rompimento chega com candle forte e expansão do histograma.",
- mk:[{t:"avoid",up:1,r:"minBW",w:[8,24],x:"Evitar antecipar: no ponto de maior compressão, a direção ainda não existe. Entrar aqui é adivinhar."},
+ mk:[{t:"avoid",up:1,r:"minBW",w:[8,18],x:"Evitar antecipar: no ponto de maior compressão, a direção ainda não existe. Entrar aqui é adivinhar."},
  {t:"buy",r:"brkU",w:[22,34],x:"Compra no fechamento acima da banda superior, com corpo grande e histograma do MACD crescendo."},
  {t:"buy",r:"reclaim9",w:[34,43],x:"Reentrada no pullback à MA9, com a nova tendência de alta em curso."},
  {t:"avoid",up:1,r:"aboveU",w:[38,50],x:"Evitar comprar esticado: fechamento fora da banda, longe da MA9, depois de uma perna longa."}],
@@ -254,7 +276,7 @@ const SC=[
 {id:"s5",g:"g-comp",seed:12,title:"Compressão e falso rompimento",
  wp:[...SQ,[24,128020,8],[26,128100,16],[28,128060,16],[32,127960,20],[42,127830,26],[46,127880,22],[53,127800,26]],
  lead:"O mesmo começo do cenário anterior, mas o rompimento falha: o preço volta para dentro das bandas, perde a média 20 e segue na direção oposta.",
- mk:[{t:"avoid",up:1,r:"brkU",w:[22,30],x:"Evitar comprar o rompimento neste caso: o histograma mal expande e a continuação não aparece. Confirmação importa mais que velocidade."},
+ mk:[{t:"avoid",up:1,r:"brkU",w:[22,30],x:"Evitar comprar o rompimento neste caso: o histograma expande pouco e os candles seguintes não dão continuação. Confirmação importa mais que velocidade."},
  {t:"sell",up:1,r:"lose20",w:[26,36],x:"Venda na perda da média 20, depois do rompimento falho. Stop acima da máxima do falso rompimento."},
  {t:"avoid",r:"belowL",w:[34,46],x:"Evitar vender no esticado: fechamento fora da banda inferior. O ideal era entrar antes, na perda da média 20."}],
  ctx:"Compressão seguida de rompimento sem corpo forte e sem expansão do histograma.",gat:"Fechamento de volta abaixo da média 20 após rompimento falho.",stp:"Stop acima da máxima do falso rompimento. Alvo no extremo inferior da compressão e depois na banda inferior.",inv:"Novo fechamento acima da banda superior com histograma crescendo."},
@@ -287,6 +309,14 @@ $("chk").innerHTML=CK.map((t,i)=>`<li><input type="checkbox" id="c${i}"><label f
 const links=[...document.querySelectorAll("nav a")];
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(l=>l.classList.toggle("on",l.getAttribute("href")==="#"+e.target.id))}),{rootMargin:"-30% 0px -60% 0px"});
 document.querySelectorAll("section").forEach(s=>io.observe(s));
+</script>
+<script>
+(()=>{const b=document.getElementById("menuBtn"),n=document.getElementById("menu"),g=document.getElementById("navBg");
+const set=o=>{n.classList.toggle("open",o);g.classList.toggle("open",o);b.classList.toggle("open",o);b.setAttribute("aria-expanded",String(o));b.setAttribute("aria-label",o?"Fechar menu":"Abrir menu");document.body.classList.toggle("noscroll",o)};
+b.addEventListener("click",()=>set(!n.classList.contains("open")));g.addEventListener("click",()=>set(false));
+n.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>set(false)));
+document.addEventListener("keydown",e=>{if(e.key==="Escape")set(false)});
+matchMedia("(min-width:901px)").addEventListener("change",e=>{if(e.matches)set(false)})})();
 </script>
 </body>
 </html>
