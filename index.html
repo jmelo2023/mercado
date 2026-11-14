@@ -115,6 +115,17 @@ header h1{color:#fff}header .lead{color:#E6FBF8}
 header .flow strong{color:var(--teal)}
 nav a.on,nav a:hover{background:var(--teal-l)}
 @media(max-width:900px){header{padding:28px 22px}}
+.calbox{background:var(--paper);border:1px solid var(--line);padding:4px 24px;margin-bottom:8px}
+.cal{list-style:none;margin:0;padding:0}
+.cal li{display:grid;grid-template-columns:190px 1fr;gap:18px;padding:16px 0;border-top:1px solid var(--line)}
+.cal li:first-child{border-top:0}
+.cal time{font:500 15px var(--mono);color:var(--teal);line-height:1.4}
+.cal time small{display:block;color:var(--mute);font:400 13px var(--sans)}
+.cal h3{margin:0 0 4px;font-size:18px}
+.cal p{margin:0 0 6px;font-size:16px;color:var(--mute)}
+.cal .sig{margin:2px 6px 0 0}
+.cal li.big{background:linear-gradient(90deg,var(--amber-l),transparent 60%);margin:0 -24px;padding-left:24px;padding-right:24px}
+@media(max-width:900px){.cal li{grid-template-columns:1fr;gap:4px}}
 </style>
 </head>
 <body>
@@ -124,6 +135,7 @@ nav a.on,nav a:hover{background:var(--teal-l)}
 <a href="#motores">1. Motores do mercado</a>
 <a href="#correlacoes">2. Correlações e armadilhas</a>
 <a href="#cronograma">3. Cronograma do pregão</a>
+<a href="#calendario">Calendário econômico</a>
 <a href="#telas">4. Configuração de tela</a>
 <a href="#codigos">5. Códigos e fórmulas</a>
 <a href="#pratica">6. Cenários e checklist</a>
@@ -210,6 +222,48 @@ nav a.on,nav a:hover{background:var(--teal-l)}
 <li><time>17h55</time><span>Ajuste de posições no fechamento. O saldo do dia fica ligado ao dado das 10h30.</span></li>
 </ul></div>
 <div class="note"><b>Boas práticas:</b> antes de um dado de alto impacto o spread se alarga e a liquidez some por alguns segundos, então muitos operadores esperam o primeiro movimento se acomodar. Nos dias de CPI, payroll e FOMC, reduza o tamanho das posições e antecipe as leituras no calendário.</div>
+</section>
+
+<section id="calendario">
+<h2>Calendário econômico: eventos fixos de maior impacto</h2>
+<p class="sub">Os maiores picos de volatilidade no Ibovespa e no dólar vêm de eventos com dia e horário fixos, concentrados entre 8h00 e 18h30 (Brasília). Os horários dos eventos americanos abaixo valem para novembro, fora do horário de verão dos EUA; entre março e outubro eles saem 1 hora mais cedo.</p>
+
+<div class="group">1. Eventos semanais<small>Acontecem toda semana.</small></div>
+<div class="calbox"><ul class="cal">
+<li><time>Segunda-feira<small>08h25</small></time><div><h3>Boletim Focus (Brasil)</h3><p>Pesquisa do Banco Central com as projeções do mercado para Selic, IPCA, PIB e dólar. Uma revisão forte nas expectativas de juros ou inflação impacta a abertura do DI Futuro às 9h.</p><span class="sig">DI Futuro</span><span class="sig">USD/BRL</span></div></li>
+<li><time>Quinta-feira<small>10h30</small></time><div><h3>Pedidos de seguro-desemprego (EUA)</h3><p>Mede semanalmente o aquecimento do mercado de trabalho americano. Surpresas geram movimentos rápidos nas Treasuries e no USD/BRL.</p><span class="sig">Treasuries</span><span class="sig">USD/BRL</span></div></li>
+</ul></div>
+
+<div class="group">2. Eventos mensais<small>Os maiores movimentos do mês.</small></div>
+<div class="calbox"><ul class="cal">
+<li class="big"><time>1ª sexta-feira do mês<small>10h30</small></time><div><h3>Payroll (EUA)</h3><p>O relatório oficial de emprego dos Estados Unidos. É o indicador mensal que mais gera volatilidade instantânea no mundo, com fortes oscilações no dólar, nas bolsas e nos juros futuros.</p><span class="sig">USD/BRL</span><span class="sig">Treasuries</span><span class="sig">IBOV</span></div></li>
+<li><time>Entre os dias 10 e 15<small>10h30</small></time><div><h3>CPI e PPI (EUA)</h3><p>Inflação ao consumidor (CPI) e ao produtor (PPI). Como orientam os próximos passos do Federal Reserve, movimentam com força o DXY e os juros globais.</p><span class="sig">DXY</span><span class="sig">Treasuries</span><span class="sig">USD/BRL</span></div></li>
+<li><time>Entre os dias 09 e 12<small>09h00</small></time><div><h3>IPCA (Brasil)</h3><p>A inflação oficial, divulgada pelo IBGE. Afeta diretamente a curva do DI Futuro e as ações ligadas ao consumo doméstico na abertura do pregão.</p><span class="sig">DI Futuro</span><span class="sig">Ações domésticas</span></div></li>
+<li><time>Última semana do mês<small>09h00</small></time><div><h3>IPCA-15 (Brasil)</h3><p>A prévia da inflação oficial, que costuma antecipar a reação do mercado antes do IPCA fechado.</p><span class="sig">DI Futuro</span><span class="sig">Ações domésticas</span></div></li>
+<li><time>Última sexta-feira do mês<small>10h30</small></time><div><h3>PCE (EUA)</h3><p>O índice de inflação preferido do banco central americano para decidir sobre juros.</p><span class="sig">Treasuries</span><span class="sig">DXY</span><span class="sig">USD/BRL</span></div></li>
+</ul></div>
+
+<div class="group">3. Política monetária<small>Cada banco central faz 8 reuniões por ano, a cada cerca de 45 dias. É a combinação mais intensa de volatilidade quando as decisões caem no mesmo dia, as chamadas “Super Quartas”.</small></div>
+<div class="calbox"><ul class="cal">
+<li class="big"><time>Quarta-feira<small>16h00 e 16h30</small></time><div><h3>Decisão do FOMC / Fed (EUA)</h3><p>O banco central americano anuncia a taxa de juros e divulga suas projeções econômicas. Às 16h30, a coletiva do presidente do Fed provoca uma segunda onda forte de volatilidade.</p><span class="sig">Todos os mercados globais</span></div></li>
+<li class="big"><time>Quarta-feira<small>a partir das 18h30</small></time><div><h3>Decisão do Copom (Brasil)</h3><p>O Banco Central divulga a nova Selic depois do fechamento do mercado à vista brasileiro. O impacto total é absorvido na abertura do dia seguinte, às 09h00.</p><span class="sig">Abertura do dia seguinte</span></div></li>
+<li><time>Terça-feira seguinte<small>08h00</small></time><div><h3>Ata do Copom</h3><p>Detalha os motivos da decisão e sinaliza os próximos passos da Selic, movimentando os contratos de DI na abertura.</p><span class="sig">DI Futuro</span><span class="sig">IBOV</span></div></li>
+</ul></div>
+<div class="note"><b>Atenção:</b> as reuniões do Copom e do FOMC seguem calendários próprios, então nem toda decisão cai no mesmo dia. Confira as datas de cada semana no calendário oficial de cada banco central ou no Investing.com.</div>
+
+<div class="group">Resumo de referência rápida</div>
+<div class="tw"><table>
+<thead><tr><th>Evento / indicador</th><th>Periodicidade / dia</th><th>Horário (Brasília)</th><th>Principal ativo afetado</th></tr></thead>
+<tbody>
+<tr><td>Boletim Focus</td><td>Toda segunda-feira</td><td>08h25</td><td>DI Futuro e USD/BRL</td></tr>
+<tr><td>Ata do Copom</td><td>Terça-feira (pós-reunião)</td><td>08h00</td><td>DI Futuro e IBOV</td></tr>
+<tr><td>IPCA / IPCA-15</td><td>Mensal (dias 09–12 / fim do mês)</td><td>09h00</td><td>DI Futuro e ações domésticas</td></tr>
+<tr><td>Payroll (emprego EUA)</td><td>1ª sexta-feira do mês</td><td>10h30</td><td>USD/BRL, Treasuries e IBOV</td></tr>
+<tr><td>CPI / PPI / PCE (inflação EUA)</td><td>Mensal</td><td>10h30</td><td>Treasuries, DXY e USD/BRL</td></tr>
+<tr><td>Decisão FOMC (Fed EUA)</td><td>Quarta-feira (8x ao ano)</td><td>16h00</td><td>Todos os mercados globais</td></tr>
+<tr><td>Decisão Copom (Selic)</td><td>Quarta-feira (8x ao ano)</td><td>18h30</td><td>Abertura do dia seguinte (09h)</td></tr>
+</tbody></table></div>
+<div class="note"><b>Dica operacional:</b> nos segundos exatos em que esses indicadores saem, especialmente às 09h00 e às 10h30, a liquidez nos livros de ofertas desaparece por instantes (spread alargado) e o preço costuma dar “violinadas” para os dois lados antes de assumir a direção real. Acompanhe as datas exatas de cada semana no Calendário Econômico do Investing.com.</div>
 </section>
 
 <section id="telas">
