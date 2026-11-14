@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day trade no mini índice (WIN) e mini dólar (WDO): Bollinger, MA9, MACD e intermercados</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap">
+<style>
+:root{--bg:#E4F5F2;--paper:#fff;--ink:#0B1F24;--mute:#41575B;--line:#B5D8D2;--teal:#00857A;--teal-l:#BDF0E8;--amber:#F59E0B;--amber-l:#FFE7B0;--red:#E5342A;--red-l:#FFD3CE;--blue:#1565E0;--blue-l:#D6E6FF;
+--serif:'Newsreader',Georgia,serif;--sans:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:20px}
+body{margin:0;background:var(--bg);color:var(--ink);font:18.5px/1.6 var(--sans)}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.shell{display:grid;grid-template-columns:270px minmax(0,1fr);gap:56px;padding:0 3vw}
+nav{position:sticky;top:0;align-self:start;padding:40px 0;height:100vh}
+nav b{font:600 17px var(--serif);display:block;margin-bottom:18px;line-height:1.3}
+nav a{display:block;text-decoration:none;color:var(--mute);padding:7px 0 7px 14px;border-left:2px solid var(--line);font-size:16px}
+nav a:hover,nav a.on{color:var(--teal);border-color:var(--teal);background:var(--teal-l);font-weight:500}
+main{padding:40px 0 80px;min-width:0}
+header{background:linear-gradient(120deg,#0B3D91 0%,#00857A 100%);color:#fff;padding:44px;margin-bottom:8px}
+h1{font:600 clamp(34px,5vw,54px)/1.08 var(--serif);margin:0 0 16px;max-width:26ch}
+header p{color:#E6FBF8;max-width:90ch;margin:0 0 20px;font-size:20px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.3)}
+.kpis div{background:rgba(0,40,70,.35);padding:14px 18px}
+.kpis b{display:block;font:500 22px var(--mono)}.kpis span{font-size:15px;color:#D2F5F0}
+h2{font:600 clamp(28px,3vw,36px)/1.15 var(--serif);margin:0 0 8px}
+h3{font:600 20px var(--sans);margin:0 0 8px}
+section{padding:56px 0 8px;border-top:1px solid var(--line);margin-top:56px}
+.sub{color:var(--mute);max-width:100ch;margin:0 0 26px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.card{background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--teal);padding:22px}
+.card:nth-child(2n){border-top-color:var(--blue)}.card.warn{border-top-color:var(--amber)}
+.card p,.card li{font-size:16.5px;margin:0 0 8px}.card ul{padding-left:20px;margin:6px 0 0}
+.card .att{font-size:15.5px;color:var(--mute);border-top:1px dashed var(--line);padding-top:10px;margin:10px 0 0}
+.big{font:500 30px var(--mono);color:var(--teal);display:block}
+.note{background:var(--amber-l);border-left:4px solid var(--amber);padding:14px 18px;margin:22px 0;font-size:16.5px;max-width:110ch}
+.group{margin:34px 0 12px;font:600 22px var(--serif)}.group small{display:block;font:400 16px var(--sans);color:var(--mute)}
+.tw{overflow-x:auto;border:1px solid var(--line);background:var(--paper)}
+table{width:100%;border-collapse:collapse;font-size:16.5px;min-width:820px}
+th{text-align:left;padding:12px 16px;background:var(--teal);color:#fff}td{padding:12px 16px;border-top:1px solid var(--line);vertical-align:top}
+.chip{font:500 14px var(--mono);padding:3px 9px;white-space:nowrap;display:inline-block}
+.pos{background:var(--teal-l);color:#006157}.neg{background:var(--red-l);color:#A8150F}.neu{background:var(--blue-l);color:#0B3D91}
+.ex{background:var(--paper);border:1px solid var(--line);border-left:5px solid var(--amber);padding:20px 24px;margin:18px 0}
+.ex h4{font:600 21px var(--serif);margin:0 0 4px}.ex .tag{font:500 14px var(--mono);color:#B45F00;display:block;margin-bottom:6px}
+.ex p,.ex li{font-size:16.5px;margin:6px 0}.ex ul{padding-left:20px;margin:6px 0}
+.calc{font:500 15px var(--mono);background:var(--bg);padding:10px 14px;display:block;margin:10px 0;overflow-x:auto;line-height:1.7}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:12px 0}
+.rules div{background:var(--paper);padding:12px 16px;font-size:16px}.rules b{display:block;color:var(--teal);font-size:15px;margin-bottom:2px}
+.mes{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:12px 0}
+.mes div{background:var(--paper);border:1px solid var(--line);padding:8px 6px;text-align:center;font-size:15px}
+.mes b{font:600 24px var(--mono);color:var(--teal);display:block}
+.mes .par{background:var(--amber-l);border-color:var(--amber)}
+code{font:500 .9em var(--mono);background:var(--bg);padding:1px 6px}
+.dec{font:500 20px var(--mono);text-transform:uppercase}
+@media(max-width:900px){.mes{grid-template-columns:repeat(3,1fr)}}
+.lab{background:var(--paper);border:1px solid var(--line);padding:18px}
+.lab svg{width:100%;height:auto;display:block}
+.legend{display:flex;gap:20px;flex-wrap:wrap;font-size:15px;color:var(--mute);margin:0 0 10px}
+.legend i{display:inline-block;width:22px;height:4px;margin-right:6px;vertical-align:middle}
+.tool{background:var(--paper);border:1px solid var(--line);padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.tool label{display:grid;grid-template-columns:1fr 170px;gap:10px;align-items:center;margin-bottom:10px;font-size:16.5px}
+select,input{font:500 16px var(--mono);padding:8px 10px;border:1px solid var(--teal);background:#fff;color:var(--ink);width:100%}
+.out{background:var(--bg);padding:20px;align-self:start}
+.out .v{font:600 34px var(--serif);display:block;margin:4px 0 8px}
+.out p{margin:4px 0;font-size:16.5px}
+.bar{height:14px;background:linear-gradient(90deg,var(--red),#ddd 50%,var(--teal));position:relative;margin:12px 0}
+.bar i{position:absolute;top:-5px;width:6px;height:24px;background:var(--ink);transition:left .25s}
+.check{list-style:none;padding:0;margin:0;background:var(--paper);border:1px solid var(--line)}
+.check li{padding:13px 16px 13px 48px;border-top:1px solid var(--line);position:relative}.check li:first-child{border:0}
+.check input{position:absolute;left:16px;top:17px;width:18px;height:18px;accent-color:var(--teal)}
+.check input:checked+label{color:var(--mute);text-decoration:line-through}
+footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);font-size:15px;color:var(--mute);max-width:110ch}
+@media(max-width:900px){.shell{display:block;padding:0 18px}nav{display:none}.grid2,.grid3,.grid4,.tool,.rules,.kpis{grid-template-columns:1fr}header{padding:28px 22px}.tool label{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.bar i{transition:none}}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav aria-label="Seções">
+<b>Day trade no WIN</b>
+<a href="#contrato">1. Contrato e rotina</a>
+<a href="#tickers">Tickers e vencimentos</a>
+<a href="#contexto">2. Contexto intermercados</a>
+<a href="#indicadores">3. Bollinger, MA9 e MACD</a>
+<a href="#lab">4. Laboratório visual</a>
+<a href="#setups">5. Setups com exemplos</a>
+<a href="#risco">6. Gestão de risco</a>
+<a href="#plano">7. Plano e checklist</a>
+</nav>
+<main>
+<header>
+<h1>Day trade no mini índice: contexto primeiro, gatilho depois</h1>
+<p>Como combinar Bollinger, MA9 e MACD com a leitura de USD/BRL, IFNC, DI1F27, DI1F31, S&amp;P 500, VIX e DXY para operar o WIN e o WDO com critério.</p>
+<div class="kpis"><div><b>R$ 0,20</b><span>por ponto, por contrato</span></div><div><b>5 pts</b><span>tick mínimo (R$ 1,00)</span></div><div><b>WINZ26</b><span>contrato de dezembro/2026</span></div><div><b>Meses pares</b><span>vencimentos do WIN</span></div></div>
+</header>
+
+<section id="contrato">
+<h2>1. O contrato e a rotina do dia</h2>
+<p class="sub">Antes de qualquer indicador, conheça o que está sendo negociado e quando o fluxo é mais confiável.</p>
+<div class="grid4">
+<div class="card"><h3>Valor do ponto</h3><span class="big">R$ 0,20</span><p>O WIN equivale a 20% do contrato cheio (IND). Resultado = contratos × pontos × 0,20.</p></div>
+<div class="card"><h3>Tick mínimo</h3><span class="big">5 pontos</span><p>Cada tick vale R$ 1,00 por contrato. Stops e alvos andam em múltiplos de 5.</p></div>
+<div class="card"><h3>Vencimento</h3><span class="big">Meses pares</span><p>Quarta-feira mais próxima do dia 15. O WINZ26 vence em 16/12/2026; depois a liquidez migra para o WING27 (fevereiro).</p></div>
+<div class="card"><h3>Horário</h3><span class="big">9h às 18h</span><p>Grade aproximada. A B3 ajusta os horários com o horário de verão dos EUA e da Europa, então confirme a grade vigente.</p></div>
+</div>
+<div class="ex"><span class="tag">Exemplo de cálculo · hipotético</span><h4>Resultado de um trade</h4>
+<span class="calc">Compra: 3 contratos a 128.400 · Saída: 128.650<br>250 pts × 3 contratos × R$ 0,20 = R$ 150,00 (bruto, antes de custos e imposto)</span></div>
+<div class="group">Janelas do dia<small>Detalhes do calendário no guia de análise intermercados. Os horários abaixo seguem a grade padrão de novembro.</small></div>
+<div class="grid3">
+<div class="card warn"><h3>09h00 – 10h00 · abertura</h3><p>Absorve Ásia, Europa e futuros dos EUA. Spreads maiores e movimentos bruscos. Use para ler o viés, não para operar rápido.</p></div>
+<div class="card"><h3>10h00 – 12h30 · fluxo principal</h3><p>Ações entram às 10h e os dados dos EUA saem às 10h30. É a janela com mais liquidez e os melhores movimentos direcionais, mas também a mais sensível a notícias.</p></div>
+<div class="card warn"><h3>12h30 – 14h30 · almoço</h3><p>Liquidez menor e movimentos erráticos. As bandas tendem a se comprimir e o risco de falsos rompimentos aumenta.</p></div>
+</div>
+<div class="note"><b>Regra de ouro:</b> em minutos de dados de alto impacto (payroll, CPI, FOMC, Copom) os indicadores técnicos perdem valor. Fique de fora até o preço se acomodar ou reduza o tamanho da posição.</div>
+</section>
+
+<section id="tickers">
+<h2>Como são formados os tickers e os vencimentos</h2>
+<p class="sub">Todo contrato futuro segue o mesmo padrão: código do ativo, letra do mês de vencimento e dois dígitos do ano. Entender isso evita operar o contrato errado, principalmente na rolagem.</p>
+<div class="grid3">
+<div class="card"><h3>Anatomia do código</h3><span class="big">WIN Z 26</span><p><b>WIN</b> é o ativo (mini Ibovespa), <b>Z</b> é a letra do mês (dezembro) e <b>26</b> é o ano. O contrato vence em dezembro de 2026.</p></div>
+<div class="card"><h3>Contrato vigente</h3><span class="big">Mais líquido</span><p>Em geral, o contrato mais próximo do vencimento concentra o volume. Perto da data, a liquidez migra para o seguinte, e é aí que se faz a rolagem.</p></div>
+<div class="card warn"><h3>Cuidado com o mês</h3><span class="big">Confira</span><p>Contrato vencido ou sem liquidez tem spread maior e execução ruim. Confirme sempre a letra do mês antes de enviar a ordem.</p></div>
+</div>
+<div class="group">Letras dos meses<small>Os meses em destaque são os de vencimento do WIN e do IND (pares).</small></div>
+<div class="mes">
+<div><b>F</b>janeiro</div><div class="par"><b>G</b>fevereiro</div><div><b>H</b>março</div><div class="par"><b>J</b>abril</div><div><b>K</b>maio</div><div class="par"><b>M</b>junho</div>
+<div><b>N</b>julho</div><div class="par"><b>Q</b>agosto</div><div><b>U</b>setembro</div><div class="par"><b>V</b>outubro</div><div><b>X</b>novembro</div><div class="par"><b>Z</b>dezembro</div>
+</div>
+<div class="tw"><table>
+<thead><tr><th>Ativo</th><th>Formação do código</th><th>Vencimento</th><th>Exemplos e contrato atual</th></tr></thead>
+<tbody>
+<tr><td><b>WIN</b> (mini Ibovespa)<br><b>IND</b> (cheio)</td><td>WIN + letra par + ano</td><td>Meses pares (G, J, M, Q, V, Z), na quarta-feira mais próxima do dia 15</td><td><code>WINZ26</code> vence em 16/12/2026. Depois: <code>WING27</code> (fevereiro/2027).</td></tr>
+<tr><td><b>WDO</b> (mini dólar)<br><b>DOL</b> (cheio)</td><td>WDO + letra do mês + ano</td><td>Todos os meses, no primeiro dia útil do mês de vencimento</td><td><code>WDOZ26</code> vence em 01/12/2026, então já é o contrato atual. Depois: <code>WDOF27</code> (04/01/2027).</td></tr>
+<tr><td><b>DI1</b> (DI Futuro)</td><td>DI1 + letra do mês + ano</td><td>Todos os meses, no primeiro dia útil do mês de vencimento</td><td><code>DI1F27</code> vence em 04/01/2027. <code>DI1F31</code> vence no primeiro dia útil de janeiro de 2031. Os vértices de janeiro (F) são referências de mercado.</td></tr>
+<tr><td><b>EWZ</b></td><td>Ticker de ETF, sem letra de mês</td><td>Não tem vencimento. Suas opções vencem em geral na terceira sexta-feira do mês</td><td>Negociado na NYSE Arca, em dólar, no horário americano e no pré-mercado.</td></tr>
+<tr><td><b>Ações da B3</b></td><td>4 letras + número</td><td>Sem vencimento. Número 3 = ON, 4 = PN, 11 = unit, ETF ou FII</td><td><code>ITUB4</code>, <code>B3SA3</code>, <code>BPAC11</code>.</td></tr>
+<tr><td><b>Opções de ações</b></td><td>4 letras + letra do mês + preço de exercício</td><td>Terceira sexta-feira do mês. Letras A a L são calls (janeiro a dezembro) e M a X são puts</td><td>Relevante para estratégias como a Wheel.</td></tr>
+</tbody></table></div>
+<div class="note"><b>Rolagem e gráfico contínuo:</b> as plataformas oferecem símbolos contínuos (por exemplo <code>WIN$N</code> ou <code>WIN@N</code>, conforme a plataforma). Na troca de contrato, o preço dá um salto (ágio ou desconto entre os vencimentos), e médias, bandas e MACD calculados na junção ficam distorcidos. Para robôs e backtests, confirme se o histórico está ajustado e evite abrir posições nos candles da própria rolagem.</div>
+<div class="group">Decodificador de ticker<small>Digite um código de futuro (WIN, IND, WDO, DOL ou DI1) para ver o mês e o vencimento calculado. As datas seguem a regra geral: confirme no calendário oficial da B3.</small></div>
+<div class="tool">
+<div><label>Ticker<input id="tk" class="dec" value="WINZ26" maxlength="8" autocomplete="off"></label><p style="font-size:16px;color:var(--mute)">Exemplos: WINZ26, WDOF27, DI1F31, INDG27.</p></div>
+<div class="out"><span>Contrato</span><span class="v" id="tkV">–</span><p id="tkR"></p><p id="tkD"></p></div>
+</div>
+</section>
+
+<section id="contexto">
+<h2>2. Contexto intermercados: quem empurra o WIN e o WDO</h2>
+<p class="sub">O WIN replica o Ibovespa, e o Ibovespa responde a juros, câmbio, risco global e aos pesos-pesados (bancos, Vale e Petrobras). Monte o viés do dia com estes ativos antes de olhar o gráfico do WIN.</p>
+<div class="tw"><table>
+<thead><tr><th>Ativo</th><th>Efeito típico no WIN</th><th>Por quê</th><th>Como usar na tela</th></tr></thead>
+<tbody>
+<tr><td><b>S&amp;P 500</b> (futuro)</td><td><span class="chip pos">mesmo sentido</span></td><td>É o termômetro global de apetite a risco. Fluxo estrangeiro entra e sai de emergentes junto com ele, e a B3 costuma mudar de direção na abertura de Nova York.</td><td>Se o S&amp;P vira para baixo às 11h30 e o WIN segue subindo, desconfie da força do movimento. Divergências duram pouco.</td></tr>
+<tr><td><b>VIX</b></td><td><span class="chip neg">sentido oposto</span></td><td>Mede o medo no mercado americano. Alta do VIX significa busca por proteção e saída de emergentes.</td><td>Referência prática: abaixo de 15, calmaria; entre 15 e 20, normal; acima de 25, estresse. Uma alta de 10% ou mais no dia é sinal de alerta para compras.</td></tr>
+<tr><td><b>DXY</b></td><td><span class="chip neg">sentido oposto</span></td><td>Dólar forte no mundo encarece o capital para emergentes e pressiona moedas e ações.</td><td>DXY e US10Y subindo juntos formam o cenário mais hostil para o Brasil. Se o DXY cai e o real não acompanha, o problema é local.</td></tr>
+<tr><td><b>USD/BRL</b> (WDO)</td><td><span class="chip neg">em geral oposto</span></td><td>Dólar subindo por risco fiscal ou fuga de capital derruba o índice. Mas exportadoras (Vale, Petrobras) se beneficiam do câmbio, então a relação não é perfeita.</td><td>Pergunte sempre por que o dólar sobe. Se for força global (DXY), o impacto no WIN é menor do que quando o motivo é doméstico (DI longo e CDS subindo juntos).</td></tr>
+<tr><td><b>DI1F27</b> (curto)</td><td><span class="chip neu">depende</span></td><td>Vence no primeiro dia útil de janeiro de 2027, então hoje reflete quase só a Selic/CDI até lá. Reage a Copom, Focus e dados de inflação, e pouco a risco fiscal.</td><td>Use para medir expectativa de juros imediata. Com o vencimento próximo, passe a usar o DI1F28 como vértice curto de referência.</td></tr>
+<tr><td><b>DI1F31</b> (longo)</td><td><span class="chip neg">sentido oposto</span></td><td>Vértice de cerca de quatro anos, carrega prêmio fiscal e inflação futura. Taxa maior encarece o desconto dos lucros futuros e pesa em varejo, construção, tecnologia e bancos de varejo.</td><td>Taxa longa subindo com o curto parado sinaliza estresse fiscal e tende a derrubar WIN e subir o dólar. Observe também a inclinação F31 − F27.</td></tr>
+<tr><td><b>IFNC</b> (financeiro)</td><td><span class="chip pos">mesmo sentido, com peso</span></td><td>Bancos e a B3 têm peso grande no Ibovespa; Itaú, BTG, Bradesco, Banco do Brasil e B3 concentram a maior parte do IFNC. Sofre com juro longo alto, resultado trimestral e crédito.</td><td>Divergência é informação: WIN subindo com IFNC caindo indica rali puxado por commodities, com menos amplitude e mais fragilidade. WIN e IFNC subindo juntos dão mais confiança.</td></tr>
+<tr><td><b>EWZ</b> (ETF Brasil em dólar)</td><td><span class="chip pos">mesmo sentido</span></td><td>Fundo da iShares que reúne grandes ações brasileiras, cotado em dólar na bolsa de Nova York. Negocia no pré-mercado americano, quando a B3 já abriu mas Wall Street ainda não, e depois do fechamento.</td><td>WIN implícito ≈ variação do EWZ + variação do USD/BRL. A composição difere do Ibovespa e o pré-mercado tem pouco volume, então use como referência de direção, não como alvo.</td></tr>
+</tbody></table></div>
+<div class="group">Simulador de viés do dia<small>Escolha o que cada ativo está fazendo agora. É uma heurística de leitura, não um sinal de compra ou venda.</small></div>
+<div class="tool">
+<div id="simIn"></div>
+<div class="out"><span>Viés para o WIN</span><span class="v" id="simV">Neutro</span><div class="bar"><i id="simB" style="left:50%"></i></div><p id="simT"></p></div>
+</div>
+<div class="ex"><span class="tag">Exemplo · hipotético</span><h4>Estresse fiscal em uma terça-feira</h4>
+<p>DI1F31 sobe de 13,80% para 14,05% (+25 bps) com o DI1F27 quase parado, o dólar avança 1,1%, o IFNC cai 1,8% e o S&amp;P 500 está estável.</p>
+<p><b>Leitura:</b> o S&amp;P neutro descarta causa externa. A combinação de juro longo em alta, dólar forte e bancos em queda aponta para risco doméstico. Nesse dia, o rali de rebotes no gráfico do WIN deve ser tratado com cautela e as vendas nos rompimentos para baixo têm mais respaldo.</p></div>
+<div class="ex"><span class="tag">Exemplo · hipotético</span><h4>Lendo o EWZ antes da abertura</h4>
+<span class="calc">EWZ −1,8% no pré-mercado · USD/BRL +0,6%<br>WIN implícito ≈ −1,8% + 0,6% = −1,2%</span>
+<p>Se o WIN abre com queda muito menor (por exemplo −0,3%), há espaço para alinhamento. Se o EWZ vira para cima às 11h30, com a abertura de Nova York, sem o dólar acompanhar, o movimento externo está melhorando e o WIN costuma reagir.</p></div>
+<div class="group" id="wdo" style="margin-top:56px;font-size:28px">Quem empurra o WDO (mini dólar)<small>O WDO responde aos mesmos vetores globais, mas com mais peso de juros, risco-país, fluxo cambial e atuação do Banco Central.</small></div>
+<div class="grid3">
+<div class="card"><h3>Valor do ponto</h3><span class="big">R$ 10,00</span><p>Cada ponto vale R$ 10 por contrato (contrato de US$ 10.000, cotado em reais por US$ 1.000). Muito mais caro por ponto que o WIN.</p></div>
+<div class="card"><h3>Tick mínimo</h3><span class="big">0,5 ponto</span><p>Cada tick vale R$ 5,00 por contrato. Um dólar a 5.400 que sobe 1% anda cerca de 54 pontos, ou R$ 540 por contrato.</p></div>
+<div class="card warn"><h3>Vencimento</h3><span class="big">1º dia útil</span><p>O WDOZ26 vence em 01/12/2026. A rolagem do dólar acontece todo mês, então confira a letra do contrato antes de operar.</p></div>
+</div>
+<div class="tw" style="margin-top:20px"><table>
+<thead><tr><th>Ativo</th><th>Efeito típico no WDO</th><th>Por quê</th><th>Como usar na tela</th></tr></thead>
+<tbody>
+<tr><td><b>DXY</b></td><td><span class="chip pos">mesmo sentido</span></td><td>Mede o dólar contra moedas desenvolvidas. O real não faz parte da cesta, então a relação é moderada.</td><td>Use a razão USDBRL/DXY para isolar o que é doméstico: se ela sobe, o real está pior do que o mundo.</td></tr>
+<tr><td><b>US10Y e US02Y</b></td><td><span class="chip pos">mesmo sentido</span></td><td>Juros americanos maiores aumentam o custo do dinheiro e atraem capital para os EUA.</td><td>Em dias de dados (10h30), o US02Y reage primeiro, por ser mais sensível às expectativas do Fed.</td></tr>
+<tr><td><b>USD/MXN</b></td><td><span class="chip pos">mesmo sentido</span></td><td>Emergentes se movem em bloco e o peso mexicano costuma antecipar o real.</td><td>Se o USDMXN sobe e o WDO está parado, tende a haver alinhamento. Se só o WDO sobe, o motivo é local.</td></tr>
+<tr><td><b>DI curto</b> (DI1F27, DI1F28)</td><td><span class="chip neu">depende</span></td><td>Compõe o diferencial de juros. Alta por credibilidade monetária atrai carry e derruba o dólar; alta por inflação fora de controle pode piorar o risco.</td><td>Confira a inclinação da curva. O DI1F27 vence em janeiro, então prefira o DI1F28 como vértice curto.</td></tr>
+<tr><td><b>DI longo</b> (DI1F31)</td><td><span class="chip pos">mesmo sentido, se for fiscal</span></td><td>Alta do juro longo com o curto parado indica prêmio de risco doméstico e fuga de capital.</td><td>DI1F31 e dólar subindo juntos, com DXY estável, é o sinal mais claro de estresse fiscal.</td></tr>
+<tr><td><b>CDS Brasil</b></td><td><span class="chip pos">mesmo sentido</span></td><td>Mede a percepção de risco do país e costuma mover o dólar quase de imediato.</td><td>Use como confirmação do DI longo: os dois subindo reforçam o risco doméstico.</td></tr>
+<tr><td><b>S&amp;P 500 e VIX</b></td><td><span class="chip neg">S&amp;P oposto, VIX mesmo sentido</span></td><td>Aversão global a risco leva capital para o dólar e para fora de emergentes.</td><td>VIX acima de 25 com S&amp;P em queda costuma pressionar o WDO para cima, principalmente no começo do pregão americano.</td></tr>
+<tr><td><b>Commodities</b> (Brent, minério, CRB)</td><td><span class="chip neg">sentido oposto</span></td><td>Alta das commodities aumenta a entrada de dólares comerciais no Brasil.</td><td>Dólar caindo com minério e Brent subindo sugere fluxo exportador. Sem a alta das commodities, o movimento merece mais cautela.</td></tr>
+<tr><td><b>WIN, IFNC e EWZ</b></td><td><span class="chip neg">sentido oposto</span></td><td>Ações em queda com dólar em alta indicam saída de capital. O EWZ é cotado em dólar e embute o câmbio, então ele não confirma o WDO de forma independente.</td><td>Para confirmar o WDO, prefira o WIN e o IFNC. WIN em queda e IFNC fraco reforçam um dólar em alta de fundo local.</td></tr>
+<tr><td><b>Fluxo, Banco Central e PTAX</b></td><td><span class="chip neu">pontual</span></td><td>Exportadores, remessas e leilões do Banco Central movem o dólar sem relação com outros ativos. A PTAX é calculada em quatro janelas, por volta das 10h, 11h, 12h e 13h.</td><td>Perto das janelas de PTAX, o preço pode oscilar por ajuste de posições. Evite entradas nesses minutos ou reduza o tamanho. Confirme as janelas no site do Banco Central.</td></tr>
+</tbody></table></div>
+<div class="group">Simulador de viés do dólar<small>Marque o que cada ativo está fazendo. Heurística de leitura, não sinal de compra ou venda.</small></div>
+<div class="tool">
+<div id="wIn"></div>
+<div class="out"><span>Viés para o WDO</span><span class="v" id="wV">Neutro</span><div class="bar"><i id="wB" style="left:50%"></i></div><p id="wT"></p></div>
+</div>
+<div class="group">WIN e WDO juntos<small>A leitura conjunta ajuda a separar apetite global, risco doméstico e fluxo de commodities.</small></div>
+<div class="tw"><table>
+<thead><tr><th>WIN</th><th>WDO</th><th>Leitura provável</th></tr></thead>
+<tbody>
+<tr><td><span class="chip pos">sobe</span></td><td><span class="chip neg">cai</span></td><td>Apetite por risco (risk-on), fluxo entrando e juros comportados. O cenário mais limpo para compras no WIN.</td></tr>
+<tr><td><span class="chip neg">cai</span></td><td><span class="chip pos">sobe</span></td><td>Aversão a risco ou estresse doméstico. Cheque o DI longo para separar causa externa de causa fiscal.</td></tr>
+<tr><td><span class="chip pos">sobe</span></td><td><span class="chip pos">sobe</span></td><td>Rali puxado por exportadoras (Vale, Petrobras) ou dólar global forte. O IFNC fraco indica pouca amplitude e mais fragilidade.</td></tr>
+<tr><td><span class="chip neg">cai</span></td><td><span class="chip neg">cai</span></td><td>Realização ou queda setorial com o dólar cedendo, muitas vezes por ajuste de posições ou notícias de juros. Evite generalizar.</td></tr>
+</tbody></table></div>
+<div class="ex"><span class="tag">Exemplo · hipotético</span><h4>Dólar sobe sozinho</h4>
+<span class="calc">DXY −0,4% · USDMXN estável · DI1F31 +20 bps · CDS em alta · WDO +0,7%<br>0,7% de 5.400 ≈ 38 pontos → com 2 contratos: 38 × 2 × R$ 10 ≈ R$ 760</span>
+<p><b>Leitura:</b> o mundo está calmo, mas o juro longo e o CDS sobem junto com o dólar. O movimento é local. Rompimentos de alta no WDO têm mais respaldo, e quedas do WIN tendem a ter força nos mesmos minutos.</p></div>
+<div class="ex"><span class="tag">Exemplo · hipotético</span><h4>Mesmos setups, outra escala</h4>
+<span class="calc">Setup 2 no WDO (pullback na MA9): entrada 5.412,0 · stop 5.409,0 (3 pontos) · alvo 5.418,0 (6 pontos) → 2:1<br>Com 2 contratos: risco = 3 × 2 × R$ 10 = R$ 60 · ganho potencial = R$ 120</span>
+<p>Bollinger, MA9 e MACD funcionam do mesmo jeito. O que muda é a escala: stops e alvos em pontos pequenos, tick de 0,5 e R$ 10 por ponto. Use a calculadora da seção 6, agora com a opção WDO.</p></div>
+</section>
+
+<section id="indicadores">
+<h2>3. Bollinger, MA9 e MACD: o que cada um responde</h2>
+<p class="sub">Os três medem coisas diferentes. Bollinger mostra volatilidade, a MA9 mostra o ritmo imediato e o MACD mostra a força do momento. Usados juntos, eles ajudam a classificar o regime do mercado antes de escolher a estratégia.</p>
+<div class="grid3">
+<div class="card"><h3>Bandas de Bollinger (20, 2)</h3><p>Média móvel de 20 períodos com duas bandas a 2 desvios-padrão. A largura das bandas mede a volatilidade.</p><ul><li><b>Compressão (squeeze):</b> bandas estreitas antecedem expansão. O rompimento dá a direção.</li><li><b>Tendência:</b> fechamentos junto à banda externa com a média inclinada mostram força, não reversão.</li><li><b>Lateralidade:</b> com a média plana, o preço oscila entre as bandas e tende a voltar à média.</li></ul><p class="att">Armadilha: tocar a banda externa não é sinal de reversão por si só. Em tendência, o preço pode “andar na banda” por muitos candles.</p></div>
+<div class="card"><h3>MA9 (média de 9 períodos)</h3><p>É a média mais rápida do conjunto. Muitos operadores preferem a exponencial (MME9) por reagir mais cedo.</p><ul><li><b>Inclinação:</b> subindo, o viés é de compra; descendo, de venda; plana, sem direção.</li><li><b>Pullback:</b> em tendência, o preço recua até a MA9 e retoma. É um ponto de entrada de risco curto.</li><li><b>Trailing:</b> serve de referência para acompanhar o stop.</li></ul><p class="att">Armadilha: em mercado lateral, o preço cruza a MA9 sem parar e gera uma série de stops pequenos.</p></div>
+<div class="card"><h3>MACD (12, 26, 9)</h3><p>Diferença entre as médias de 12 e 26 períodos (linha MACD), com uma média de 9 dessa diferença (sinal) e o histograma entre as duas.</p><ul><li><b>Linha zero:</b> MACD acima de zero indica tendência de alta, abaixo indica baixa.</li><li><b>Histograma:</b> barras crescendo mostram aceleração; encolhendo, perda de força.</li><li><b>Divergência:</b> preço faz nova máxima e o MACD não confirma, alerta de exaustão.</li></ul><p class="att">Armadilha: o MACD atrasa. Em movimentos explosivos, o cruzamento chega depois da melhor parte.</p></div>
+</div>
+<div class="group">Como combinar: o regime decide a ferramenta</div>
+<div class="tw"><table>
+<thead><tr><th>Regime</th><th>Como identificar</th><th>Ferramenta principal</th><th>Estratégia</th></tr></thead>
+<tbody>
+<tr><td><b>Lateral</b></td><td>Bandas paralelas, média 20 plana, MACD cruzando a linha zero várias vezes</td><td>Bollinger</td><td>Reversão à média entre as bandas, com alvo na média 20</td></tr>
+<tr><td><b>Compressão</b></td><td>Bandas estreitando, histograma do MACD perto de zero</td><td>Bollinger + MACD</td><td>Aguardar rompimento com expansão das bandas e do histograma</td></tr>
+<tr><td><b>Tendência</b></td><td>Média 20 inclinada, preço acima (ou abaixo) dela, MACD do mesmo lado da linha zero</td><td>MA9</td><td>Pullback na MA9 a favor da tendência, com stop curto</td></tr>
+<tr><td><b>Exaustão</b></td><td>Fechamento fora da banda, histograma encolhendo, divergência no MACD</td><td>MACD</td><td>Realizar parcial ou aguardar confirmação antes de contra-tendência</td></tr>
+</tbody></table></div>
+<div class="note"><b>Tempo gráfico:</b> use 5 minutos para definir o regime e 1 ou 2 minutos para o gatilho. Entrar contra o regime do gráfico maior é a causa mais comum de stops seguidos.</div>
+</section>
+
+<section id="lab">
+<h2>4. Laboratório visual</h2>
+<p class="sub">Série sintética gerada na página com os cálculos reais dos três indicadores. As marcações são detectadas por regras simples: compressão (menor largura das bandas), rompimento (fechamento acima da banda superior) e pullback na MA9 com retomada.</p>
+<div class="lab">
+<div class="legend"><span><i style="background:#0B1F24"></i>Preço</span><span><i style="background:#F59E0B"></i>MA9 (exponencial)</span><span><i style="background:#1565E0"></i>Média 20 e bandas</span><span><i style="background:#00857A"></i>MACD</span><span><i style="background:#E5342A"></i>Sinal</span></div>
+<svg id="chP" viewBox="0 0 1000 330" role="img" aria-label="Preço com bandas de Bollinger e MA9"></svg>
+<svg id="chM" viewBox="0 0 1000 130" role="img" aria-label="MACD com histograma e linha de sinal"></svg>
+<p id="labT" style="font-size:16px;color:var(--mute);margin:10px 0 0"></p>
+</div>
+</section>
+
+<section id="setups">
+<h2>5. Setups com exemplos práticos</h2>
+<p class="sub">Todos os números são hipotéticos e em pontos do WIN. A ideia é mostrar a lógica: contexto, gatilho, stop, alvo e relação risco/retorno.</p>
+
+<div class="ex"><span class="tag">Setup 1 · compressão e rompimento</span><h4>Rompimento da compressão a favor do contexto</h4>
+<div class="rules"><div><b>Contexto</b>S&amp;P estável ou em alta, VIX caindo, IFNC subindo, DI longo parado</div><div><b>Gatilho</b>Bandas estreitas por vários candles; fechamento acima da banda superior com histograma do MACD crescendo</div><div><b>Stop e alvo</b>Stop abaixo da média 20; alvo de 1,5 a 2 vezes o risco, com trailing na MA9</div></div>
+<span class="calc">Entrada: compra a 128.540 · Média 20: 128.470 → stop a 128.460 (80 pts)<br>Alvo: 128.700 (160 pts) → relação 2:1<br>Com 2 contratos: risco = 80 × 2 × 0,20 = R$ 32 · ganho potencial = 160 × 2 × 0,20 = R$ 64</span>
+<p><b>Invalidação:</b> o preço volta para dentro das bandas em até dois candles. Rompimento sem expansão do histograma costuma ser armadilha.</p></div>
+
+<div class="ex"><span class="tag">Setup 2 · pullback na MA9</span><h4>Entrada a favor da tendência</h4>
+<div class="rules"><div><b>Contexto</b>Preço acima da média 20, MACD acima de zero, DXY e VIX sem pressão</div><div><b>Gatilho</b>Recuo até a MA9, candle de retomada e entrada no rompimento da máxima desse candle</div><div><b>Stop e alvo</b>Stop abaixo da mínima do candle de retomada; alvo na máxima anterior ou na banda superior</div></div>
+<span class="calc">Máxima anterior: 128.900 · pullback até 128.760 · candle de retomada: mín. 128.750, máx. 128.790<br>Entrada: 128.795 · Stop: 128.745 (50 pts) · Alvo: 128.895 (100 pts) → 2:1<br>Com 4 contratos: risco = 50 × 4 × 0,20 = R$ 40 · ganho potencial = R$ 80</span>
+<p><b>Invalidação:</b> o fechamento perde a média 20 ou o histograma do MACD muda de lado antes da retomada.</p></div>
+
+<div class="ex"><span class="tag">Setup 3 · reversão à média</span><h4>Toque na banda em mercado lateral</h4>
+<div class="rules"><div><b>Contexto</b>Média 20 plana, bandas paralelas, MACD oscilando em torno de zero, horário de baixa liquidez</div><div><b>Gatilho</b>Candle toca ou fecha fora da banda e o seguinte volta para dentro; entrada na confirmação</div><div><b>Stop e alvo</b>Stop além do extremo do candle; alvo na média 20</div></div>
+<span class="calc">Banda superior: 128.610 · candle de rejeição com máxima em 128.640 → entrada vendida a 128.600<br>Stop: 128.650 (50 pts) · Alvo: média 20 em 128.520 (80 pts) → 1,6:1<br>Com 3 contratos: risco = R$ 30 · ganho potencial = R$ 48</span>
+<p><b>Invalidação:</b> se o dia tem catalisador (dado, Copom, notícia fiscal), a banda pode ser rompida de vez. Se o fechamento ocorre acima da banda com histograma acelerando, é tendência, não reversão.</p></div>
+
+<div class="ex"><span class="tag">Setup 4 · divergência com intermercados</span><h4>Rali sem o IFNC</h4>
+<div class="rules"><div><b>Contexto</b>WIN faz nova máxima, mas IFNC não confirma e o DI1F31 sobe</div><div><b>Gatilho</b>Divergência de baixa do MACD na banda superior e fechamento abaixo da MA9</div><div><b>Stop e alvo</b>Stop acima da máxima; alvo na média 20, realizando parte antes</div></div>
+<span class="calc">Máxima do dia: 129.050 · divergência no MACD · fechamento abaixo da MA9 em 128.980<br>Entrada vendida: 128.975 · Stop: 129.060 (85 pts) · Alvo: 128.800 (175 pts) → 2:1</span>
+<p><b>Por que funciona (às vezes):</b> o rali depende de poucos papéis e o juro longo pressiona o restante. Mesmo assim, é uma operação contra-tendência e exige tamanho reduzido.</p></div>
+</section>
+
+<section id="risco">
+<h2>6. Gestão de risco</h2>
+<p class="sub">O que decide o resultado no longo prazo é quanto se perde quando o setup falha. Defina o risco em reais antes de definir o tamanho da posição.</p>
+<div class="tool">
+<div>
+<label>Contrato<select id="ct"><option value="0.2">WIN (R$ 0,20 por ponto)</option><option value="10">WDO (R$ 10,00 por ponto)</option></select></label>
+<label>Risco máximo por trade (R$)<input id="rk" type="number" value="50" min="1"></label>
+<label>Stop (pontos)<input id="st" type="number" value="80" min="5" step="5"></label>
+<label>Alvo (pontos)<input id="al" type="number" value="160" min="5" step="5"></label>
+<label>Custo por contrato, ida e volta (R$)<input id="cs" type="number" value="0" min="0" step="0.1"></label>
+</div>
+<div class="out"><span>Tamanho sugerido</span><span class="v" id="rN">–</span><p id="rR"></p><p id="rG"></p><p id="rP"></p></div>
+</div>
+<div class="grid3" style="margin-top:20px">
+<div class="card"><h3>Limites diários</h3><p>Defina antes da abertura uma perda máxima diária e um número máximo de trades. Ao atingir o limite, pare. Perseguir prejuízo é a forma mais rápida de multiplicá-lo.</p></div>
+<div class="card"><h3>Relação risco/retorno</h3><p>Com alvo de 2 vezes o stop, é possível ter lucro acertando pouco mais de um terço das operações, antes de custos. Com 1:1, são necessários mais de 50% de acerto.</p></div>
+<div class="card warn"><h3>Realidade estatística</h3><p>Um estudo de 2020 com day traders de futuros no Brasil (Chague, De-Losso e Giovannetti) concluiu que quase todos que persistiram por mais de 300 dias tiveram prejuízo. Operar com plano e registro é o mínimo.</p></div>
+</div>
+</section>
+
+<section id="plano">
+<h2>7. Plano e checklist</h2>
+<p class="sub">Marque os itens conforme avança. A marcação não é salva.</p>
+<ul class="check" id="chk"></ul>
+<footer>Material educacional, sem recomendação de compra ou venda. Todos os valores de exemplo são hipotéticos. Day trade com derivativos envolve risco elevado de perda, inclusive acima do capital alocado. Confira as especificações do contrato, horários e margens vigentes na B3 e na sua corretora antes de operar.</footer>
+</section>
+</main>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+/* ---------- Simulador de viés ---------- */
+const SIM=[["S&P 500 (futuro)",1],["VIX",-1],["DXY",-.75],["USD/BRL",-.75],["DI1F31 (taxa)",-1],["IFNC",1.25],["EWZ (pré-mercado)",1]];
+$("simIn").innerHTML=SIM.map((s,i)=>`<label>${s[0]}<select id="s${i}"><option value="1">Em alta</option><option value="0" selected>Estável</option><option value="-1">Em queda</option></select></label>`).join("");
+function sim(){let sc=0,max=0,ifn=0;SIM.forEach((s,i)=>{const v=+$("s"+i).value;sc+=v*s[1];max+=Math.abs(s[1]);if(i==5)ifn=v*s[1]});
+ const a=Math.abs(sc);$("simV").textContent=a<1?"Neutro":(sc>0?"Viés comprador":"Viés vendedor")+(a>2.5?" forte":" leve");
+ $("simB").style.left=(50+sc/max*50)+"%";
+ let t="Pontuação "+sc.toFixed(2).replace(".",",")+" de ±"+max.toFixed(2).replace(".",",")+".";
+ if(a>=1&&ifn*sc<0)t+=" O IFNC contraria o restante do quadro: movimento com pouca amplitude e mais frágil.";
+ if(a<1)t+=" Sinais contraditórios ou ausentes: priorize setups de reversão e reduza o tamanho.";
+ $("simT").textContent=t}
+SIM.forEach((_,i)=>$("s"+i).addEventListener("input",sim));sim();
+
+/* ---------- Simulador WDO ---------- */
+const WS=[["DXY",1],["US10Y",.75],["USD/MXN",1.25],["DI1F31 (taxa)",1],["VIX",.75],["S&P 500 (futuro)",-.75],["Commodities (Brent, minério)",-.5]];
+$("wIn").innerHTML=WS.map((x,i)=>`<label>${x[0]}<select id="w${i}"><option value="1">Em alta</option><option value="0" selected>Estável</option><option value="-1">Em queda</option></select></label>`).join("");
+function wsim(){let sc=0,mx=0,mxn=0;WS.forEach((x,i)=>{const v=+$("w"+i).value;sc+=v*x[1];mx+=Math.abs(x[1]);if(i==2)mxn=v*x[1]});
+ const a=Math.abs(sc);$("wV").textContent=a<1?"Neutro":(sc>0?"Viés de alta do dólar":"Viés de queda do dólar")+(a>2.5?" forte":" leve");
+ $("wB").style.left=(50+sc/mx*50)+"%";
+ let t="Pontuação "+sc.toFixed(2).replace(".",",")+" de ±"+mx.toFixed(2).replace(".",",")+".";
+ if(a>=1&&mxn*sc<0)t+=" O USD/MXN contraria o quadro: o movimento tende a ser local, não de emergentes em bloco.";
+ if(a<1)t+=" Sinais contraditórios ou ausentes: reduza o tamanho e prefira setups de reversão.";
+ $("wT").textContent=t}
+WS.forEach((_,i)=>$("w"+i).addEventListener("input",wsim));wsim();
+
+/* ---------- Laboratório ---------- */
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const r=rng(11),N=150,C=[];let p=128000;
+for(let i=0;i<N;i++){
+ if(i<60){p=128000+150*Math.sin(i/4.5)*(1-i/66)+(r()-.5)*(66-i)}
+ else{const d=i<90?42:i<112?-30:30;p+=d+(r()-.5)*110}
+ C.push(p)}
+const ema=(a,n)=>{const k=2/(n+1),o=[a[0]];for(let i=1;i<a.length;i++)o.push(a[i]*k+o[i-1]*(1-k));return o};
+const sma=(a,n)=>a.map((_,i)=>i<n-1?null:a.slice(i-n+1,i+1).reduce((x,y)=>x+y,0)/n);
+const m20=sma(C,20),sdv=C.map((_,i)=>{if(i<19)return null;const w=C.slice(i-19,i+1);return Math.sqrt(w.reduce((x,y)=>x+(y-m20[i])**2,0)/20)});
+const up=m20.map((m,i)=>m==null?null:m+2*sdv[i]),lo=m20.map((m,i)=>m==null?null:m-2*sdv[i]);
+const e9=ema(C,9),mac=ema(C,12).map((v,i)=>v-ema(C,26)[i]),sig=ema(mac,9),his=mac.map((v,i)=>v-sig[i]);
+const bw=m20.map((m,i)=>m==null?null:(up[i]-lo[i])/m);
+let sq=25;for(let i=25;i<75;i++)if(bw[i]<bw[sq])sq=i;
+let bo=null;for(let i=sq+1;i<N;i++)if(C[i]>up[i]){bo=i;break}
+let pb=null,rt=null;if(bo!=null){for(let i=bo+6;i<N;i++)if(C[i]<=e9[i]*1.0003&&C[i]>m20[i]){pb=i;break}
+ if(pb!=null)for(let i=pb+1;i<N;i++)if(C[i]>e9[i]&&C[i]>C[i-1]){rt=i;break}}
+const X=i=>30+i*940/(N-1);
+const vals=[...C,...up.filter(v=>v!=null),...lo.filter(v=>v!=null)],mn=Math.min(...vals),mx=Math.max(...vals);
+const Y=v=>300-(v-mn)/(mx-mn)*280;
+const L=(a,f,s=0)=>a.map((v,i)=>v==null||i<s?"":(f(i,v))).join("");
+const path=(a,f)=>{let d="",st=0;a.forEach((v,i)=>{if(v==null)return;d+=(st?"L":"M")+X(i).toFixed(1)+" "+f(v).toFixed(1)+" ";st=1});return d};
+let g=`<path d="${path(up,Y)}L${[...lo].map((v,i)=>[v,i]).filter(a=>a[0]!=null).reverse().map(a=>X(a[1]).toFixed(1)+" "+Y(a[0]).toFixed(1)).join("L")}Z" fill="#1565E0" opacity=".10"/>`;
+g+=`<path d="${path(up,Y)}" fill="none" stroke="#1565E0" stroke-width="1.5"/><path d="${path(lo,Y)}" fill="none" stroke="#1565E0" stroke-width="1.5"/><path d="${path(m20,Y)}" fill="none" stroke="#1565E0" stroke-width="1.5" stroke-dasharray="5 4"/>`;
+g+=`<path d="${path(e9,Y)}" fill="none" stroke="#F59E0B" stroke-width="2.4"/><path d="${path(C,Y)}" fill="none" stroke="#0B1F24" stroke-width="2"/>`;
+const mk=(i,t,c,dy)=>i==null?"":`<line x1="${X(i)}" x2="${X(i)}" y1="10" y2="320" stroke="${c}" stroke-dasharray="3 4" opacity=".7"/><circle cx="${X(i)}" cy="${Y(C[i])}" r="6" fill="${c}"/><text x="${X(i)+8}" y="${dy}" font-size="15" font-weight="600" fill="${c}">${t}</text>`;
+g+=mk(sq,"Compressão","#1565E0",28)+mk(bo,"Rompimento","#00857A",48)+mk(pb,"Pullback na MA9","#B45F00",68)+mk(rt,"Retomada","#00857A",88);
+$("chP").innerHTML=g;
+const mv=[...mac,...sig,...his],a1=Math.min(...mv),a2=Math.max(...mv),YM=v=>120-(v-a1)/(a2-a1)*110;
+let h=`<line x1="30" x2="970" y1="${YM(0)}" y2="${YM(0)}" stroke="#B5D8D2"/>`;
+his.forEach((v,i)=>{h+=`<rect x="${X(i)-2.5}" y="${Math.min(YM(0),YM(v))}" width="5" height="${Math.abs(YM(v)-YM(0))}" fill="${v>=0?"#00857A":"#E5342A"}" opacity=".45"/>`});
+h+=`<path d="${path(mac,YM)}" fill="none" stroke="#00857A" stroke-width="2"/><path d="${path(sig,YM)}" fill="none" stroke="#E5342A" stroke-width="2"/>`;
+$("chM").innerHTML=h;
+const f=v=>(v*100).toFixed(2).replace(".",",")+"%";
+$("labT").textContent="Compressão na barra "+sq+" (largura das bandas de "+f(bw[sq])+" contra "+f(Math.max(...bw.filter(v=>v!=null)))+" no máximo da série). "+(bo?"Rompimento na barra "+bo+" com o histograma do MACD passando a crescer. ":"")+(pb?"Pullback na MA9 na barra "+pb+(rt?" e retomada na barra "+rt+", o ponto de entrada do setup 2.":"."):"");
+
+/* ---------- Decodificador de tickers ---------- */
+const MES={F:1,G:2,H:3,J:4,K:5,M:6,N:7,Q:8,U:9,V:10,X:11,Z:12},NM=["","janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"],DS=["domingo","segunda-feira","terça-feira","quarta-feira","quinta-feira","sexta-feira","sábado"];
+function pascoa(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;return new Date(y,mo-1,da)}
+const key=d=>d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate();
+function feriados(y){const S=new Set();
+ [[1,1],[21,4],[1,5],[7,9],[12,10],[2,11],[15,11],[20,11],[25,12]].forEach(a=>S.add(key(new Date(y,a[1]-1,a[0]))));
+ const e=pascoa(y);[-48,-47,-2,60].forEach(o=>S.add(key(new Date(e.getFullYear(),e.getMonth(),e.getDate()+o))));return S}
+const util=d=>d.getDay()%6!=0&&!feriados(d.getFullYear()).has(key(d));
+function primUtil(y,m){const d=new Date(y,m-1,1);while(!util(d))d.setDate(d.getDate()+1);return d}
+function qua15(y,m){let b=null;for(let n=8;n<=22;n++){const d=new Date(y,m-1,n);if(d.getDay()==3&&(!b||Math.abs(n-15)<Math.abs(b.getDate()-15)))b=d}while(!util(b))b.setDate(b.getDate()+1);return b}
+const fd=d=>String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear()+" ("+DS[d.getDay()]+")";
+function dec(){const t=$("tk").value.replace(/\s/g,"").toUpperCase(),m=t.match(/^(WIN|IND|WDO|DOL|DI1)([FGHJKMNQUVXZ])(\d{2})$/);
+ if(!m){$("tkV").textContent="–";$("tkR").textContent="Formato esperado: WIN, IND, WDO, DOL ou DI1, mais a letra do mês e dois dígitos do ano (ex.: WINZ26).";$("tkD").textContent="";return}
+ const mes=MES[m[2]],ano=2000+ +m[3],ind=m[1]=="WIN"||m[1]=="IND",nome={WIN:"Mini Ibovespa",IND:"Ibovespa cheio",WDO:"Mini dólar",DOL:"Dólar cheio",DI1:"DI Futuro"}[m[1]];
+ $("tkV").textContent=nome;
+ if(ind&&mes%2){$("tkR").textContent="Esse contrato não existe em "+NM[mes]+": WIN e IND vencem apenas em meses pares (G, J, M, Q, V, Z).";$("tkD").textContent="";return}
+ const d=ind?qua15(ano,mes):primUtil(ano,mes),h=new Date();h.setHours(0,0,0,0);const dias=Math.round((d-h)/864e5);
+ $("tkR").textContent="Vencimento em "+NM[mes]+" de "+ano+": "+fd(d)+". "+(ind?"Regra: quarta-feira mais próxima do dia 15.":"Regra: primeiro dia útil do mês.");
+ $("tkD").textContent=dias>0?"Faltam "+dias+" dias corridos.":dias==0?"Vence hoje.":"Contrato já vencido."}
+$("tk").addEventListener("input",dec);dec();
+
+/* ---------- Risco ---------- */
+function risco(){const rk=+$("rk").value,st=+$("st").value,al=+$("al").value,cs=+$("cs").value;
+ const pv=+$("ct").value,r1=st*pv,g1=al*pv,n=Math.floor(rk/r1+1e-9);const br=v=>"R$ "+v.toFixed(2).replace(".",",");
+ if(!(n>0)){$("rN").textContent="0 contratos";$("rR").textContent="O risco máximo é menor que o risco de 1 contrato ("+br(r1)+"). Aumente o risco ou reduza o stop.";$("rG").textContent="";$("rP").textContent="";return}
+ $("rN").textContent=n+(n>1?" contratos":" contrato");
+ $("rR").textContent="Risco real: "+br(n*r1)+" ("+st+" pts × "+n+" × "+br(pv)+").";
+ $("rG").textContent="Ganho potencial: "+br(n*g1)+" · relação "+(al/st).toFixed(2).replace(".",",")+":1.";
+ $("rP").textContent="Taxa de acerto mínima para empatar: "+(((r1+cs)/(r1+g1))*100).toFixed(1).replace(".",",")+"%."}
+["rk","st","al","cs"].forEach(i=>$(i).addEventListener("input",risco));
+$("ct").addEventListener("change",()=>{const w=+$("ct").value==10;$("st").value=w?3:80;$("al").value=w?6:160;$("st").step=$("al").step=w?.5:5;risco()});risco();
+
+/* ---------- Checklist ---------- */
+const CK=["Conferi a agenda do dia (payroll, CPI, FOMC, Copom, IPCA) e marquei os horários de fora.","Li S&P 500, VIX, DXY e EWZ no pré-mercado antes das 9h e defini o viés global.","Olhei USD/BRL, DI1F27 e DI1F31 e entendi se o movimento é externo ou doméstico.","Comparei o IFNC com o WIN para avaliar a amplitude do movimento.","Classifiquei o regime no gráfico de 5 minutos: lateral, compressão ou tendência.","Escolhi um único setup compatível com o regime e escrevi gatilho, stop e alvo.","Calculei o tamanho da posição a partir do risco em reais, não da vontade de operar.","Defini perda máxima diária e número máximo de trades.","Confirmei o contrato vigente e a data de rolagem.","Ao final, registrei cada trade com contexto, resultado e o que faria diferente."];
+$("chk").innerHTML=CK.map((t,i)=>`<li><input type="checkbox" id="c${i}"><label for="c${i}">${t}</label></li>`).join("");
+const links=[...document.querySelectorAll("nav a")];
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(l=>l.classList.toggle("on",l.getAttribute("href")==="#"+e.target.id))}),{rootMargin:"-30% 0px -60% 0px"});
+document.querySelectorAll("section").forEach(s=>io.observe(s));
+</script>
+</body>
+</html>
