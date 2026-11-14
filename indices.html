@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel de Índices — Brasil e Mundo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --fundo:#0e2830; --painel:#143741; --linha:#25505c; --texto:#e6eeee; --suave:#8fb0b6;
+  --alta:#62d9a5; --baixa:#ff8272; --foco:#f2c75c;
+  --sans:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fundo);color:var(--texto);font:15px/1.5 var(--sans)}
+main{max-width:1280px;margin:0 auto;padding:24px 20px 48px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px;margin-bottom:20px}
+h1{font-size:22px;font-weight:600;margin:0}
+h2{font-size:16px;font-weight:600;margin:0}
+.status{color:var(--suave);font-size:13px}
+.status b{font-family:var(--mono);font-weight:500;color:var(--texto)}
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-bottom:24px}
+.card{background:var(--painel);border:1px solid var(--linha);border-left:4px solid var(--cor);border-radius:6px;padding:12px 14px;text-align:left;color:inherit;font:inherit;cursor:pointer;transition:opacity .15s}
+.card[aria-pressed="false"]{opacity:.45}
+.card:focus-visible,.per button:focus-visible{outline:2px solid var(--foco);outline-offset:2px}
+.card .nome{font-size:13px;color:var(--suave)}
+.card .preco{font:500 24px/1.3 var(--mono);font-variant-numeric:tabular-nums}
+.card .var{font:400 13px var(--mono);font-variant-numeric:tabular-nums}
+.card .hora{font-size:12px;color:var(--suave);margin-top:2px}
+.alta{color:var(--alta)} .baixa{color:var(--baixa)} .indisp{color:var(--suave)}
+section.bloco{background:var(--painel);border:1px solid var(--linha);border-radius:6px;padding:16px;margin-bottom:24px}
+.topo{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.per{display:flex;gap:4px}
+.per button{background:transparent;color:var(--suave);border:1px solid var(--linha);border-radius:4px;padding:5px 12px;font:500 13px var(--sans);cursor:pointer}
+.per button[aria-pressed="true"]{background:var(--texto);color:var(--fundo);border-color:var(--texto)}
+.grafico{position:relative;height:420px}
+.nota{color:var(--suave);font-size:13px;margin:10px 0 0;max-width:75ch}
+footer{color:var(--suave);font-size:13px;max-width:80ch}
+#grafico{cursor:zoom-in}
+.acoes{display:flex;flex-wrap:wrap;gap:8px}
+.btn-cheia{background:transparent;color:var(--suave);border:1px solid var(--linha);border-radius:4px;padding:5px 12px;font:500 13px var(--sans);cursor:pointer}
+.btn-cheia:hover{color:var(--texto)}
+.btn-cheia:focus-visible{outline:2px solid var(--foco);outline-offset:2px}
+.bloco.cheia{position:fixed;inset:0;z-index:50;margin:0;border-radius:0;display:flex;flex-direction:column;overflow:auto}
+.bloco.cheia .grafico{flex:1;height:auto;min-height:0}
+.bloco.cheia #grafico{cursor:default}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:600px){.grafico{height:320px}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Painel de Índices</h1>
+    <div class="status" role="status">Atualizado às <b id="hora">—</b> · atualização automática a cada 30 s</div>
+  </header>
+
+  <div class="grade" id="grade" aria-label="Cotações"></div>
+
+  <section class="bloco" id="bloco-grafico" aria-labelledby="tit-graf">
+    <div class="topo">
+      <h2 id="tit-graf">Evolução comparativa (base 100)</h2>
+      <div class="acoes">
+      <div class="per" id="periodos" role="group" aria-label="Período">
+        <button data-p="1d">1 dia</button>
+        <button data-p="5d">5 dias</button>
+        <button data-p="1mo" aria-pressed="true">1 mês</button>
+      </div>
+      <button type="button" class="btn-cheia" id="btn-cheia">Tela cheia</button>
+    </div>
+    </div>
+    <div class="grafico"><canvas id="grafico" role="img" aria-label="Gráfico comparativo dos ativos em base 100"></canvas></div>
+    <p class="nota">Todas as séries partem de 100 no primeiro ponto do período, o que permite comparar ativos de escalas diferentes. Clique em um cartão para ocultar ou exibir o ativo no gráfico. Clique no gráfico para abrir em tela cheia; Esc fecha.</p>
+  </section>
+
+
+  <footer>
+    Dados: Yahoo Finance (cotações com atraso de alguns minutos conforme a bolsa). Informação apenas para acompanhamento, não é recomendação de investimento.
+  </footer>
+</main>
+
+<script>
+// ===== Configuração =====
+const API = 'api.php';
+const CORES = {ewz:'#f2c75c', dxy:'#c3a6ff', es:'#62d9a5', ym:'#3fb6c9', nq:'#7aa7ff', vix:'#ffffff', usdbrl:'#ff8272'};
+const REFRESH_COT = 30000;
+
+let periodo = '1mo', visiveis = new Set(Object.keys(CORES)), ativos = [], series = {}, chart;
+
+const fmt = (v, d) => v == null ? '—' : v.toLocaleString('pt-BR', {minimumFractionDigits:d, maximumFractionDigits:d});
+const fmtHora = ts => new Date(ts * 1000).toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+
+async function chamar(params) {
+  const r = await fetch(API + '?' + new URLSearchParams(params));
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+
+// ===== Cartões =====
+function desenharCartoes() {
+  const g = document.getElementById('grade');
+  g.innerHTML = '';
+  for (const a of ativos) {
+    const b = document.createElement('button');
+    b.className = 'card'; b.type = 'button';
+    b.style.setProperty('--cor', CORES[a.id]);
+    b.setAttribute('aria-pressed', visiveis.has(a.id));
+    let corpo;
+    if (!a.ok) {
+      corpo = `<div class="preco indisp">—</div><div class="var indisp">sem dados no momento</div>`;
+    } else {
+      const cls = a.var == null ? 'indisp' : a.var >= 0 ? 'alta' : 'baixa';
+      const sinal = a.var >= 0 ? '+' : '';
+      corpo = `<div class="preco">${fmt(a.preco, a.dec)}</div>
+        <div class="var ${cls}">${a.var == null ? '—' : sinal + fmt(a.var, a.dec) + ' (' + sinal + fmt(a.pct, 2) + '%)'}</div>
+        <div class="hora">${fmtHora(a.hora)}</div>
+        <div class="hora">Fech. anterior: ${fmt(a.anterior, a.dec)}</div>`;
+    }
+    b.innerHTML = `<div class="nome">${a.nome}</div>${corpo}`;
+    b.onclick = () => {
+      visiveis.has(a.id) ? visiveis.delete(a.id) : visiveis.add(a.id);
+      desenharCartoes(); desenharGrafico();
+    };
+    g.appendChild(b);
+  }
+}
+
+async function atualizarCotacoes() {
+  try {
+    const d = await chamar({acao:'cotacoes'});
+    ativos = d.ativos;
+    document.getElementById('hora').textContent = new Date(d.atualizado * 1000).toLocaleTimeString('pt-BR');
+    desenharCartoes();
+  } catch (e) {
+    document.getElementById('hora').textContent = 'falha ao atualizar';
+  }
+}
+
+// ===== Gráfico comparativo =====
+async function atualizarHistorico() {
+  try {
+    const d = await chamar({acao:'historico', periodo});
+    series = d.series;
+    desenharGrafico();
+  } catch (e) { /* mantém o gráfico anterior */ }
+}
+
+function desenharGrafico() {
+  const datas = [...new Set(Object.values(series).flatMap(s => s.map(p => p.d)))].sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
+  const datasets = [];
+  for (const a of ativos.length ? ativos : Object.keys(CORES).map(id => ({id, nome:id}))) {
+    const s = series[a.id];
+    if (!s || !s.length || !visiveis.has(a.id)) continue;
+    const mapa = new Map(s.map(p => [p.d, p.c]));
+    const base = s[0].c;
+    datasets.push({
+      label: a.nome, borderColor: CORES[a.id], backgroundColor: CORES[a.id],
+      borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: .15, spanGaps: true,
+      data: datas.map(d => mapa.has(d) ? +(mapa.get(d) / base * 100).toFixed(2) : null)
+    });
+  }
+  const fmtIntra = periodo === '5d'
+    ? {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}
+    : {hour:'2-digit', minute:'2-digit'};
+  const labels = datas.map(d => typeof d === 'number'
+    ? new Date(d * 1000).toLocaleString('pt-BR', fmtIntra)
+    : d.split('-').reverse().slice(0,2).join('/'));
+  if (chart) { chart.data.labels = labels; chart.data.datasets = datasets; chart.update('none'); return; }
+  chart = new Chart(document.getElementById('grafico'), {
+    type: 'line',
+    data: {labels, datasets},
+    options: {
+      responsive: true, maintainAspectRatio: false, interaction: {mode:'index', intersect:false},
+      plugins: {
+        legend: {labels: {color:'#e6eeee', usePointStyle:true, boxWidth:8}},
+        tooltip: {callbacks: {label: c => ` ${c.dataset.label}: ${c.parsed.y.toFixed(2).replace('.', ',')}`}}
+      },
+      scales: {
+        x: {ticks: {color:'#8fb0b6', maxTicksLimit:10}, grid: {color:'#25505c55'}},
+        y: {ticks: {color:'#8fb0b6'}, grid: {color:'#25505c55'}}
+      }
+    }
+  });
+}
+
+// 1 dia atualiza a cada 60 s; 5 dias e 1 mês a cada 15 min
+function agendarHistorico() {
+  const ms = periodo === '1d' ? 60000 : 900000;
+  setTimeout(async () => { await atualizarHistorico(); agendarHistorico(); }, ms);
+}
+
+document.getElementById('periodos').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  periodo = b.dataset.p;
+  document.querySelectorAll('#periodos button').forEach(x => x.setAttribute('aria-pressed', x === b));
+  atualizarHistorico();
+});
+
+// ===== Tela cheia do gráfico =====
+const blocoGraf = document.getElementById('bloco-grafico');
+const btnCheia = document.getElementById('btn-cheia');
+const emCheia = () => blocoGraf.classList.contains('cheia');
+
+function ajustarGrafico() { setTimeout(() => chart && chart.resize(), 100); }
+
+function abrirCheia() {
+  blocoGraf.classList.add('cheia');
+  document.body.style.overflow = 'hidden';
+  btnCheia.textContent = 'Fechar';
+  // API nativa quando existir; sem ela (ex.: iPhone) o painel já cobre a tela via CSS
+  if (blocoGraf.requestFullscreen) blocoGraf.requestFullscreen().catch(() => {});
+  ajustarGrafico();
+}
+
+function fecharCheia() {
+  blocoGraf.classList.remove('cheia');
+  document.body.style.overflow = '';
+  btnCheia.textContent = 'Tela cheia';
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  ajustarGrafico();
+}
+
+// Clique no gráfico abre a tela cheia; clique na legenda só oculta/exibe a série
+document.getElementById('grafico').addEventListener('click', e => {
+  if (emCheia()) return;
+  const r = e.currentTarget.getBoundingClientRect();
+  const x = e.clientX - r.left, y = e.clientY - r.top;
+  const naLegenda = chart && chart.legend && (chart.legend.legendHitBoxes || [])
+    .some(b => x >= b.left && x <= b.left + b.width && y >= b.top && y <= b.top + b.height);
+  if (!naLegenda) abrirCheia();
+});
+btnCheia.addEventListener('click', () => emCheia() ? fecharCheia() : abrirCheia());
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && emCheia()) fecharCheia(); });
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement && emCheia()) fecharCheia(); else ajustarGrafico();
+});
+
+// ===== Início =====
+(async function () {
+  await atualizarCotacoes();
+  await atualizarHistorico();
+  setInterval(atualizarCotacoes, REFRESH_COT);
+  agendarHistorico();
+})();
+</script>
+</body>
+</html>
