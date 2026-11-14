@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratório visual: Bollinger, MA9 e MACD no gráfico de 10 minutos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap">
+<style>
+:root{--bg:#E4F5F2;--paper:#fff;--ink:#0B1F24;--mute:#41575B;--line:#B5D8D2;--teal:#00857A;--teal-l:#BDF0E8;--amber:#F59E0B;--amber-l:#FFE7B0;--red:#E5342A;--red-l:#FFD3CE;--blue:#1565E0;--blue-l:#D6E6FF;
+--serif:'Newsreader',Georgia,serif;--sans:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--ink);font:18.5px/1.6 var(--sans)}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.shell{display:grid;grid-template-columns:270px minmax(0,1fr);gap:56px;padding:0 3vw}
+nav{position:sticky;top:0;align-self:start;padding:40px 0;height:100vh}
+nav b{font:600 17px var(--serif);display:block;margin-bottom:18px;line-height:1.3}
+nav a{display:block;text-decoration:none;color:var(--mute);padding:7px 0 7px 14px;border-left:2px solid var(--line);font-size:16px}
+nav a:hover,nav a.on{color:var(--teal);border-color:var(--teal);background:var(--teal-l);font-weight:500}
+main{padding:40px 0 80px;min-width:0}
+header{background:linear-gradient(120deg,#0B3D91 0%,#00857A 100%);color:#fff;padding:44px;margin-bottom:8px}
+h1{font:600 clamp(34px,5vw,54px)/1.08 var(--serif);margin:0 0 16px;max-width:26ch}
+header p{color:#E6FBF8;max-width:90ch;margin:0 0 20px;font-size:20px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.3)}
+.kpis div{background:rgba(0,40,70,.35);padding:14px 18px}.kpis b{display:block;font:500 22px var(--mono)}.kpis span{font-size:15px;color:#D2F5F0}
+h2{font:600 clamp(28px,3vw,36px)/1.15 var(--serif);margin:0 0 8px}h3{font:600 20px var(--sans);margin:0 0 8px}
+section{padding:56px 0 8px;border-top:1px solid var(--line);margin-top:56px}
+.sub{color:var(--mute);max-width:100ch;margin:0 0 26px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--teal);padding:22px}
+.card:nth-child(2n){border-top-color:var(--blue)}.card.warn{border-top-color:var(--amber)}
+.card p,.card li{font-size:16.5px;margin:0 0 8px}.card ul{padding-left:20px;margin:6px 0 0}
+.big{font:500 26px var(--mono);color:var(--teal);display:block;margin-bottom:4px}
+.note{background:var(--amber-l);border-left:4px solid var(--amber);padding:14px 18px;margin:22px 0;font-size:16.5px;max-width:110ch}
+.tw{overflow-x:auto;border:1px solid var(--line);background:var(--paper)}
+table{width:100%;border-collapse:collapse;font-size:16.5px;min-width:900px}
+th{text-align:left;padding:12px 16px;background:var(--teal);color:#fff}td{padding:12px 16px;border-top:1px solid var(--line);vertical-align:top}
+.chip{font:500 14px var(--mono);padding:3px 9px;white-space:nowrap;display:inline-block}
+.pos{background:var(--teal-l);color:#006157}.neg{background:var(--red-l);color:#A8150F}.neu{background:var(--blue-l);color:#0B3D91}.sqz{background:var(--amber-l);color:#7A4A00}
+.group{margin:40px 0 12px;font:600 26px var(--serif)}.group small{display:block;font:400 16px var(--sans);color:var(--mute);max-width:100ch}
+.ctl{position:sticky;top:0;z-index:5;background:var(--paper);border:1px solid var(--line);padding:10px 18px;display:flex;gap:22px;flex-wrap:wrap;align-items:center;font-size:15.5px;margin:18px 0}
+.ctl label{display:flex;gap:7px;align-items:center;cursor:pointer}.ctl input{width:18px;height:18px;accent-color:var(--teal)}.ctl b{color:var(--mute);font-weight:500}
+.sc{background:var(--paper);border:1px solid var(--line);border-left:5px solid var(--teal);padding:24px;margin:22px 0}
+.sc h3{font:600 24px var(--serif);margin:0 0 4px}.sc .lead{color:var(--mute);margin:0 0 14px;font-size:17px;max-width:100ch}
+.sc svg{width:100%;height:auto;display:block}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:14.5px;color:var(--mute);margin:0 0 10px}
+.legend i{display:inline-block;width:20px;height:4px;margin-right:6px;vertical-align:middle}
+.legend em{display:inline-block;width:14px;height:10px;margin-right:6px;vertical-align:middle;font-style:normal}
+.mkl{list-style:none;margin:14px 0 0;padding:0}
+.mkl li{display:grid;grid-template-columns:44px 1fr;align-items:start;padding:9px 0;border-top:1px solid var(--line);font-size:16.5px}
+.b{display:inline-grid;place-items:center;width:26px;height:26px;color:#fff;font:600 14px var(--mono)}
+.b.buy{background:#00857A;border-radius:50%}.b.sell{background:#E5342A;border-radius:50%}.b.info{background:#1565E0;border-radius:3px}
+.b.avoid{background:#F59E0B;color:#0B1F24;transform:rotate(45deg);width:22px;height:22px;margin:2px 0 0 2px}.b.avoid span{transform:rotate(-45deg)}
+.rules{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:16px 0 0}
+.rules div{background:var(--paper);padding:12px 16px;font-size:16px}.rules b{display:block;color:var(--teal);font-size:15px;margin-bottom:2px}
+.lg{display:flex;gap:26px;flex-wrap:wrap;margin:6px 0 4px;font-size:16px}.lg span{display:flex;gap:10px;align-items:center}
+.check{list-style:none;padding:0;margin:0;background:var(--paper);border:1px solid var(--line)}
+.check li{padding:13px 16px 13px 48px;border-top:1px solid var(--line);position:relative}.check li:first-child{border:0}
+.check input{position:absolute;left:16px;top:17px;width:18px;height:18px;accent-color:var(--teal)}
+.check input:checked+label{color:var(--mute);text-decoration:line-through}
+.avl{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.avl li{background:var(--paper);border:1px solid var(--line);border-left:5px solid var(--amber);padding:14px 18px;font-size:16.5px}.avl b{display:block}
+footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);font-size:15px;color:var(--mute);max-width:110ch}
+@media(max-width:900px){.shell{display:block;padding:0 18px}nav{display:none}.grid3,.kpis,.rules,.avl{grid-template-columns:1fr}header{padding:28px 22px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav aria-label="Seções">
+<b>Laboratório 10 minutos</b>
+<a href="#base">1. Configuração e leitura</a>
+<a href="#tendencia">2. Tendência</a>
+<a href="#lateral">3. Lateralização</a>
+<a href="#compressao">4. Compressão e rompimento</a>
+<a href="#reversao">5. Reversão</a>
+<a href="#matriz">6. Matriz de decisão</a>
+<a href="#evitar">7. O que evitar</a>
+</nav>
+<main>
+<header>
+<h1>Laboratório visual: Bollinger, MA9 e MACD em 10 minutos</h1>
+<p>Sete cenários gráficos com pontos de compra, venda e situações a evitar, organizados por regime de mercado: tendência, lateralização, compressão e reversão.</p>
+<div class="kpis"><div><b>10 min</b><span>tempo gráfico de leitura</span></div><div><b>BB 20, 2</b><span>bandas de Bollinger</span></div><div><b>MA9</b><span>média exponencial de 9</span></div><div><b>MACD 12, 26, 9</b><span>linha, sinal e histograma</span></div></div>
+</header>
+
+<section id="base">
+<h2>1. Configuração e como ler os gráficos</h2>
+<p class="sub">Os gráficos desta página usam preços sintéticos, mas os indicadores são calculados de verdade. Cada candle representa 10 minutos, de 09h00 às 17h50.</p>
+<div class="grid3">
+<div class="card"><h3>Parâmetros no tempo de 10 minutos</h3><span class="big">3h20 · 1h30</span><ul><li><b>Bollinger (20, 2):</b> média de 20 candles = 200 minutos.</li><li><b>MA9 exponencial:</b> 90 minutos de memória, bem mais rápida que a média 20.</li><li><b>MACD (12, 26, 9):</b> 120, 260 e 90 minutos.</li></ul><p style="margin-top:8px">Como o pregão do WIN tem cerca de 54 candles de 10 minutos, use gráfico contínuo para as médias chegarem calculadas na abertura.</p></div>
+<div class="card"><h3>O que cada indicador responde</h3><ul><li><b>Bollinger:</b> volatilidade. Bandas estreitas antecedem expansão; bandas abertas e inclinadas indicam tendência.</li><li><b>MA9:</b> ritmo imediato. Em tendência, é o “piso” (ou “teto”) dos pullbacks.</li><li><b>MACD:</b> momento. Histograma crescente mostra aceleração; histograma encolhendo mostra perda de força.</li></ul></div>
+<div class="card warn"><h3>Régua de regime (faixa colorida)</h3><p>Abaixo de cada gráfico há uma faixa que classifica cada candle automaticamente:</p><div class="lg" style="flex-direction:column;gap:6px;font-size:15.5px"><span><em style="width:22px;height:12px;background:#7FD9CD"></em>Tendência de alta</span><span><em style="width:22px;height:12px;background:#F5A29B"></em>Tendência de baixa</span><span><em style="width:22px;height:12px;background:#C5D3E8"></em>Lateral</span><span><em style="width:22px;height:12px;background:#F5C45A"></em>Compressão</span></div></div>
+</div>
+<div class="group">Legenda das marcações</div>
+<div class="lg"><span><span class="b buy">1</span>Compra (gatilho)</span><span><span class="b sell">2</span>Venda (gatilho)</span><span><span class="b avoid"><span>3</span></span>Evitar</span><span><span class="b info">4</span>Ponto de observação</span></div>
+<div class="note"><b>Como estudar:</b> desligue as marcações e tente achar sozinho onde entraria e onde ficaria de fora. Depois ligue de novo e compare. Use os controles abaixo para mostrar ou ocultar cada camada.</div>
+<div class="ctl" id="ctl"><b>Camadas:</b>
+<label><input type="checkbox" data-k="bb" checked>Bandas</label><label><input type="checkbox" data-k="m20" checked>Média 20</label><label><input type="checkbox" data-k="e9" checked>MA9</label><label><input type="checkbox" data-k="mc" checked>MACD</label><label><input type="checkbox" data-k="rg" checked>Regime</label><label><input type="checkbox" data-k="mk" checked>Marcações</label></div>
+</section>
+
+<section id="tendencia"><h2>2. Cenários de tendência</h2><p class="sub">Em tendência, a estratégia é operar a favor, usando recuos até a MA9. A banda externa e a média 20 funcionam como contexto, não como sinal de reversão.</p><div id="g-tend"></div></section>
+<section id="lateral"><h2>3. Cenário de lateralização</h2><p class="sub">Sem direção, as bandas ficam paralelas, a média 20 fica plana e o MACD oscila em torno da linha zero. A estratégia muda: reverter à média, e não seguir.</p><div id="g-lat"></div></section>
+<section id="compressao"><h2>4. Compressão e rompimento</h2><p class="sub">Bandas estreitas indicam energia acumulada. A pergunta é se o rompimento é verdadeiro ou falso.</p><div id="g-comp"></div></section>
+<section id="reversao"><h2>5. Cenários de reversão</h2><p class="sub">Reversões exigem mais evidências do que continuações: divergência no MACD, perda da MA9 e da média 20, e tamanho de posição menor.</p><div id="g-rev"></div></section>
+
+<section id="matriz">
+<h2>6. Matriz de decisão</h2>
+<p class="sub">Resumo para consulta rápida durante o pregão.</p>
+<div class="tw"><table>
+<thead><tr><th>Regime</th><th>Como identificar</th><th>Fazer</th><th>Evitar</th><th>Stop e alvo</th></tr></thead>
+<tbody>
+<tr><td><span class="chip pos">Tendência de alta</span></td><td>Preço acima da média 20, média inclinada, MACD acima de zero</td><td>Comprar retomada após toque na MA9</td><td>Vender em toque de banda; comprar fechamento esticado fora da banda</td><td>Stop abaixo da mínima do pullback. Alvo: topo anterior ou 1,5 a 2 vezes o risco</td></tr>
+<tr><td><span class="chip neg">Tendência de baixa</span></td><td>Preço abaixo da média 20, média inclinada para baixo, MACD abaixo de zero</td><td>Vender rejeição na MA9</td><td>Comprar em toque de banda inferior; vender esticado fora da banda</td><td>Stop acima da máxima do repique. Alvo: fundo anterior ou 1,5 a 2 vezes o risco</td></tr>
+<tr><td><span class="chip neu">Lateral</span></td><td>Bandas paralelas, média 20 plana, MACD cruzando zero</td><td>Reverter nas extremidades, com alvo na média 20</td><td>Operar cruzamentos da MA9; entrar no meio do intervalo</td><td>Stop além do extremo do candle. Alvo na média 20, parcial na metade</td></tr>
+<tr><td><span class="chip sqz">Compressão</span></td><td>Largura das bandas bem abaixo da média recente</td><td>Esperar fechamento fora da banda com histograma expandindo</td><td>Antecipar o rompimento; comprar rompimento com candle fraco</td><td>Stop na média 20. Alvo: 2 vezes o risco, com trailing na MA9</td></tr>
+<tr><td><span class="chip neu">Reversão de topo</span></td><td>Nova máxima com MACD menor, perda da MA9</td><td>Vender perda da MA9 com histograma negativo</td><td>Vender o primeiro topo; comprar rompimento sem confirmação do MACD</td><td>Stop acima do topo. Alvo na média 20, parcial antes</td></tr>
+<tr><td><span class="chip neu">Reversão de fundo</span></td><td>Nova mínima com MACD maior, retomada da MA9</td><td>Comprar retomada da MA9 com histograma positivo</td><td>Vender o primeiro fundo; comprar sem ver o histograma virar</td><td>Stop abaixo do fundo. Alvo na média 20, parcial antes</td></tr>
+</tbody></table></div>
+<div class="note"><b>Tamanho da posição no tempo de 10 minutos:</b> os stops ficam maiores que no 1 ou 2 minutos. Calcule contratos = risco em R$ ÷ (stop em pontos × valor do ponto). Exemplo no WIN: risco de R$ 60 com stop de 150 pontos dá 60 ÷ (150 × 0,20) = 2 contratos.</div>
+</section>
+
+<section id="evitar">
+<h2>7. O que evitar: dez filtros</h2>
+<p class="sub">A maior parte dos prejuízos vem de entradas que o gráfico até permite, mas o contexto não.</p>
+<ul class="avl">
+<li><b>Dados de alto impacto</b>Payroll, CPI, FOMC e Copom. Espere um ou dois candles de 10 minutos antes de operar.</li>
+<li><b>Fechamento esticado fora da banda</b>Comprar longe da MA9 deixa o stop distante e o alvo curto.</li>
+<li><b>Contra-tendência por toque de banda</b>Em tendência, o preço anda na banda. O toque não é reversão.</li>
+<li><b>Cruzamentos da MA9 em lateral</b>Geram sequência de stops pequenos.</li>
+<li><b>Antecipar rompimento</b>Dentro da compressão a direção ainda não existe.</li>
+<li><b>MACD cruzando perto de zero</b>Com histograma minúsculo, o cruzamento é ruído.</li>
+<li><b>Espaço curto até o alvo</b>Se a banda ou o topo anterior está a menos de 1,5 vez o stop, pule.</li>
+<li><b>Janela do almoço (12h30 às 14h30)</b>Baixa liquidez, bandas comprimindo e rompimentos falsos.</li>
+<li><b>Rolagem do contrato</b>O gráfico contínuo tem salto entre contratos, o que distorce médias, bandas e MACD.</li>
+<li><b>Sem confirmação intermercados</b>Confira S&amp;P 500, VIX, DXY, EWZ, dólar, DI longo e IFNC antes de operar contra o quadro externo.</li>
+</ul>
+<div class="group">Checklist antes de cada entrada<small>A marcação não é salva.</small></div>
+<ul class="check" id="chk"></ul>
+<footer>Material educacional. Os preços são sintéticos e os exemplos não representam resultados reais, nem recomendação de compra ou venda. Day trade com derivativos envolve risco elevado de perda. Use os indicadores como apoio, junto com gestão de risco e contexto de mercado.</footer>
+</section>
+</main>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const ema=(a,n)=>{const k=2/(n+1),o=[a[0]];for(let i=1;i<a.length;i++)o.push(a[i]*k+o[i-1]*(1-k));return o};
+const sma=(a,n)=>a.map((_,i)=>i<n-1?null:a.slice(i-n+1,i+1).reduce((x,y)=>x+y,0)/n);
+const PRE=40,N=54;
+
+/* ---------- Geração e indicadores ---------- */
+function build(S){
+ const r=rng(S.seed),wp=S.wp;
+ const f=(i,k)=>{if(i<=wp[0][0])return wp[0][k];for(let j=1;j<wp.length;j++)if(i<=wp[j][0]){const a=wp[j-1],b=wp[j],t=(i-a[0])/(b[0]-a[0]);return a[k]+(b[k]-a[k])*t}return wp[wp.length-1][k]};
+ let O=[],H=[],L=[],C=[],pv=f(-PRE,1);
+ for(let i=-PRE;i<N;i++){const v=f(i,2),c=f(i,1)+(r()-.5)*1.8*v,o=pv;pv=c;O.push(o);C.push(c);H.push(Math.max(o,c)+r()*v*.7);L.push(Math.min(o,c)-r()*v*.7)}
+ if(S.flip){const b=wp[0][1],fl=x=>2*b-x;const h2=L.map(fl),l2=H.map(fl);O=O.map(fl);C=C.map(fl);H=h2;L=l2}
+ const m=sma(C,20),sd=C.map((_,i)=>i<19?null:Math.sqrt(C.slice(i-19,i+1).reduce((x,y)=>x+(y-m[i])**2,0)/20));
+ const up=m.map((v,i)=>v==null?null:v+2*sd[i]),lo=m.map((v,i)=>v==null?null:v-2*sd[i]),bw=m.map((v,i)=>v==null?null:(up[i]-lo[i])/v);
+ const e9=ema(C,9),e26=ema(C,26),mc=ema(C,12).map((v,i)=>v-e26[i]),sg=ema(mc,9),hs=mc.map((v,i)=>v-sg[i]);
+ const rg=C.map((c,k)=>{if(k<PRE)return"";const w=bw.slice(k-30,k),av=w.reduce((x,y)=>x+y,0)/w.length;if(bw[k]<.6*av)return"sq";
+  const sl=m[k]-m[k-4],th=.4*sd[k];if(c>m[k]&&sl>th&&mc[k]>0)return"up";if(c<m[k]&&sl<-th&&mc[k]<0)return"dn";return"lat"});
+ const s=a=>a.slice(PRE);return{o:s(O),h:s(H),l:s(L),c:s(C),m:s(m),sd:s(sd),up:s(up),lo:s(lo),bw:s(bw),e9:s(e9),mc:s(mc),sg:s(sg),hs:s(hs),rg:s(rg)}}
+
+/* ---------- Regras que localizam as marcações ---------- */
+const first=(a,b,fn)=>{for(let i=Math.max(a,1);i<=b;i++)if(fn(i))return i;return -1};
+const best=(a,b,fn)=>{let k=-1,v=-1e9;for(let i=Math.max(a,1);i<=b;i++){const x=fn(i);if(x>v){v=x;k=i}}return k};
+const RULE={
+ reclaim9:(D,a,b)=>first(a,b,i=>D.l[i]<=D.e9[i]*1.00015&&D.c[i]>D.e9[i]&&D.c[i]>D.o[i]),
+ lose9:(D,a,b)=>first(a,b,i=>D.h[i]>=D.e9[i]*.99985&&D.c[i]<D.e9[i]&&D.c[i]<D.o[i]),
+ lose20:(D,a,b)=>first(a,b,i=>D.c[i]<D.m[i]&&D.c[i-1]>=D.m[i-1]),
+ brkU:(D,a,b)=>first(a,b,i=>D.c[i]>D.up[i]),
+ aboveU:(D,a,b)=>best(a,b,i=>D.c[i]-D.up[i]),
+ belowL:(D,a,b)=>best(a,b,i=>D.lo[i]-D.c[i]),
+ touchU:(D,a,b)=>best(a,b,i=>D.h[i]-D.up[i]),
+ touchL:(D,a,b)=>best(a,b,i=>D.lo[i]-D.l[i]),
+ maxH:(D,a,b)=>best(a,b,i=>D.h[i]),
+ minL:(D,a,b)=>best(a,b,i=>-D.l[i]),
+ minBW:(D,a,b)=>best(a,b,i=>-D.bw[i]),
+ crossE9:(D,a,b)=>first(a,b,i=>(D.c[i]-D.e9[i])*(D.c[i-1]-D.e9[i-1])<0),
+ macdX:(D,a,b)=>first(a,b,i=>(D.mc[i]-D.sg[i])*(D.mc[i-1]-D.sg[i-1])<0),
+ macdXdn:(D,a,b)=>first(a,b,i=>D.mc[i]<D.sg[i]&&D.mc[i-1]>=D.sg[i-1]),
+ macdXup:(D,a,b)=>first(a,b,i=>D.mc[i]>D.sg[i]&&D.mc[i-1]<=D.sg[i-1])};
+
+/* ---------- Desenho ---------- */
+const OPT={bb:1,m20:1,e9:1,mc:1,rg:1,mk:1};
+const fmt=n=>Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,".");
+const RGC={up:"#7FD9CD",dn:"#F5A29B",lat:"#C5D3E8",sq:"#F5C45A"};
+function draw(S){
+ const D=S.D,x0=64,pw=930,st=pw/N,X=i=>x0+(i+.5)*st;
+ const vals=[...D.h,...D.l,...(OPT.bb?[...D.up,...D.lo]:[])],mn=Math.min(...vals),mx=Math.max(...vals),Y=v=>16+(mx-v)/(mx-mn)*296;
+ let g="";
+ for(let k=0;k<=4;k++){const v=mn+(mx-mn)*k/4;g+=`<line x1="${x0}" x2="994" y1="${Y(v)}" y2="${Y(v)}" stroke="#DDEBE8"/><text x="${x0-6}" y="${Y(v)+4}" font-size="12" text-anchor="end" fill="#41575B">${fmt(v)}</text>`}
+ for(let i=0;i<N;i+=6){g+=`<line x1="${X(i)-st/2}" x2="${X(i)-st/2}" y1="16" y2="470" stroke="#EDF5F3"/><text x="${X(i)-st/2+3}" y="486" font-size="12" fill="#41575B">${String(9+i/6).padStart(2,"0")}:00</text>`}
+ (S.zn||[]).forEach(z=>{if(OPT.mk)g+=`<rect x="${X(z.a)-st/2}" y="16" width="${(z.b-z.a+1)*st}" height="296" fill="${z.c}" opacity=".10"/><text x="${X(z.a)-st/2+6}" y="32" font-size="13" font-weight="600" fill="#41575B">${z.l}</text>`});
+ const P=a=>a.map((v,i)=>(i?"L":"M")+X(i).toFixed(1)+" "+Y(v).toFixed(1)).join("");
+ if(OPT.bb){g+=`<path d="${P(D.up)}L${D.lo.map((v,i)=>[v,i]).reverse().map(a=>X(a[1]).toFixed(1)+" "+Y(a[0]).toFixed(1)).join("L")}Z" fill="#1565E0" opacity=".08"/><path d="${P(D.up)}" fill="none" stroke="#1565E0" stroke-width="1.4"/><path d="${P(D.lo)}" fill="none" stroke="#1565E0" stroke-width="1.4"/>`}
+ if(OPT.m20)g+=`<path d="${P(D.m)}" fill="none" stroke="#1565E0" stroke-width="1.4" stroke-dasharray="5 4"/>`;
+ for(let i=0;i<N;i++){const u=D.c[i]>=D.o[i],c=u?"#00857A":"#E5342A",top=Y(Math.max(D.o[i],D.c[i])),h=Math.max(1.5,Math.abs(Y(D.o[i])-Y(D.c[i])));
+  g+=`<line x1="${X(i)}" x2="${X(i)}" y1="${Y(D.h[i])}" y2="${Y(D.l[i])}" stroke="${c}" stroke-width="1.3"/><rect x="${X(i)-st*.3}" y="${top}" width="${st*.6}" height="${h}" fill="${c}"/>`}
+ if(OPT.e9)g+=`<path d="${P(D.e9)}" fill="none" stroke="#F59E0B" stroke-width="2.4"/>`;
+ if(OPT.mk)S.F.forEach((m,n)=>{const i=m.i,isTop=m.t=="sell"||(m.t=="avoid"&&m.up)||(m.t=="info"&&m.up);const y=isTop?Y(D.h[i])-24:Y(D.l[i])+24,y1=isTop?Y(D.h[i])-3:Y(D.l[i])+3;
+  const col={buy:"#00857A",sell:"#E5342A",avoid:"#F59E0B",info:"#1565E0"}[m.t],x=X(i);
+  g+=`<line x1="${x}" x2="${x}" y1="${y1}" y2="${y}" stroke="${col}" stroke-width="1.5"/>`;
+  g+=m.t=="avoid"?`<rect x="${x-10}" y="${y-10}" width="20" height="20" fill="${col}" transform="rotate(45 ${x} ${y})"/>`:m.t=="info"?`<rect x="${x-11}" y="${y-11}" width="22" height="22" rx="3" fill="${col}"/>`:`<circle cx="${x}" cy="${y}" r="12" fill="${col}"/>`;
+  g+=`<text x="${x}" y="${y+5}" font-size="14" font-weight="700" text-anchor="middle" fill="${m.t=="avoid"?"#0B1F24":"#fff"}">${n+1}</text>`});
+ if(OPT.rg)D.rg.forEach((k,i)=>{g+=`<rect x="${X(i)-st/2}" y="318" width="${st}" height="12" fill="${RGC[k]}"/>`});
+ if(OPT.mc){const a=[...D.mc,...D.sg,...D.hs],lo=Math.min(...a),hi=Math.max(...a),YM=v=>350+(hi-v)/(hi-lo)*110;
+  g+=`<line x1="${x0}" x2="994" y1="${YM(0)}" y2="${YM(0)}" stroke="#B5D8D2"/><text x="${x0-6}" y="${YM(0)+4}" font-size="12" text-anchor="end" fill="#41575B">0</text><text x="${x0}" y="344" font-size="12" font-weight="600" fill="#41575B">MACD (12, 26, 9)</text>`;
+  D.hs.forEach((v,i)=>{g+=`<rect x="${X(i)-st*.3}" y="${Math.min(YM(0),YM(v))}" width="${st*.6}" height="${Math.max(.5,Math.abs(YM(v)-YM(0)))}" fill="${v>=0?"#00857A":"#E5342A"}" opacity=".45"/>`});
+  g+=`<path d="${D.mc.map((v,i)=>(i?"L":"M")+X(i).toFixed(1)+" "+YM(v).toFixed(1)).join("")}" fill="none" stroke="#00857A" stroke-width="2"/><path d="${D.sg.map((v,i)=>(i?"L":"M")+X(i).toFixed(1)+" "+YM(v).toFixed(1)).join("")}" fill="none" stroke="#E5342A" stroke-width="2"/>`}
+ return`<svg viewBox="0 0 1000 494" role="img" aria-label="${S.title}">${g}</svg>`}
+
+/* ---------- Cenários ---------- */
+const WP1=[[-40,128000,22],[8,128010,22],[16,128260,28],[20,128190,22],[28,128470,30],[33,128370,24],[43,128700,34],[47,128610,26],[53,128780,28]];
+const WP6=[[-40,127900,22],[0,128000,22],[12,128400,30],[18,128290,24],[30,128480,22],[34,128430,22],[42,128200,28],[48,128110,26],[53,128150,28]];
+const SQ=[[-40,128000,26],[-30,128090,26],[-22,127940,24],[-14,128080,22],[-6,127990,18],[0,128040,16],[6,128010,10],[14,128025,6],[22,128015,5]];
+const SC=[
+{id:"s1",g:"g-tend",seed:3,title:"Tendência de alta: pullback na MA9",wp:WP1,
+ lead:"Pernas de alta separadas por recuos curtos. O preço anda junto da banda superior, a média 20 sobe e o MACD fica acima de zero.",
+ mk:[{t:"buy",r:"reclaim9",w:[17,25],x:"Primeira entrada: o candle toca a MA9 e fecha acima dela, de alta. O recuo foi absorvido e o MACD segue positivo."},
+ {t:"avoid",up:1,r:"touchU",w:[22,31],x:"Evitar vender: o preço toca a banda superior, mas em tendência isso indica força. Vender aqui é apostar contra a média 20 inclinada."},
+ {t:"buy",r:"reclaim9",w:[31,38],x:"Segunda entrada: mesmo padrão após novo recuo. Stop abaixo da mínima do pullback."},
+ {t:"avoid",up:1,r:"aboveU",w:[38,46],x:"Evitar comprar: candle esticado, fechando fora da banda superior e longe da MA9. O stop ficaria distante e o alvo, curto."}],
+ ctx:"Preço acima da média 20 inclinada, MACD acima de zero, histograma positivo, S&P e IFNC sem divergência.",gat:"Candle que toca a MA9 e fecha acima dela, em alta.",stp:"Stop abaixo da mínima do recuo. Alvo no topo anterior ou 1,5 a 2 vezes o risco.",inv:"Fechamento abaixo da média 20 com histograma do MACD cruzando para baixo."},
+{id:"s2",g:"g-tend",seed:4,flip:1,title:"Tendência de baixa: rejeição na MA9",wp:WP1,
+ lead:"O espelho do cenário anterior. Pernas de baixa com repiques curtos, preço junto da banda inferior e MACD abaixo de zero.",
+ mk:[{t:"sell",r:"lose9",w:[17,25],x:"Primeira venda: o repique toca a MA9 e o candle fecha abaixo dela, de baixa. O MACD segue negativo."},
+ {t:"avoid",r:"touchL",w:[22,31],x:"Evitar comprar: o toque na banda inferior em tendência de baixa mostra força vendedora, e não fundo."},
+ {t:"sell",r:"lose9",w:[31,38],x:"Segunda venda: mesmo padrão após novo repique. Stop acima da máxima do repique."},
+ {t:"avoid",r:"belowL",w:[38,46],x:"Evitar vender: candle esticado fechando fora da banda inferior, longe da MA9. Repiques costumam ser fortes nesse ponto."}],
+ ctx:"Preço abaixo da média 20 inclinada para baixo, MACD abaixo de zero, histograma negativo.",gat:"Candle que toca a MA9 e fecha abaixo dela, em baixa.",stp:"Stop acima da máxima do repique. Alvo no fundo anterior ou 1,5 a 2 vezes o risco.",inv:"Fechamento acima da média 20 com histograma do MACD cruzando para cima."},
+{id:"s3",g:"g-lat",seed:5,title:"Lateralização: intervalo entre suporte e resistência",
+ wp:[[-40,128250,16],[-36,128340,16],[-30,128165,16],[-24,128335,16],[-18,128170,16],[-12,128330,16],[-6,128175,16],[0,128250,14],[4,128340,16],[10,128160,16],[16,128340,16],[22,128165,16],[27,128250,14],[31,128335,16],[37,128170,16],[42,128260,14],[46,128340,16],[50,128170,16],[53,128250,16]],
+ lead:"Bandas paralelas, média 20 plana e preço oscilando entre dois extremos. O MACD cruza a linha zero várias vezes sem sustentar direção.",
+ mk:[{t:"sell",up:1,r:"touchU",w:[3,8],x:"Venda na rejeição da banda superior, com alvo na média 20."},
+ {t:"buy",r:"touchL",w:[8,13],x:"Compra na rejeição da banda inferior, com alvo na média 20."},
+ {t:"sell",up:1,r:"touchU",w:[14,19],x:"Nova venda no topo do intervalo. O padrão se repete até o rompimento."},
+ {t:"avoid",up:1,r:"crossE9",w:[24,30],x:"Evitar: cruzamento da MA9 no meio do intervalo. O preço atravessa a média várias vezes e gera stops seguidos."},
+ {t:"buy",r:"touchL",w:[34,40],x:"Compra no fundo do intervalo, com stop abaixo da mínima do candle."},
+ {t:"avoid",r:"macdX",w:[40,46],x:"Evitar: cruzamento do MACD perto da linha zero com histograma minúsculo. É ruído, não sinal."}],
+ ctx:"Média 20 plana, bandas paralelas, MACD oscilando em torno de zero. Comum na janela do almoço e em dias sem catalisador.",gat:"Rejeição na banda externa: candle toca a banda e o seguinte fecha de volta para dentro.",stp:"Stop além do extremo do candle. Alvo na média 20, com parcial na metade do caminho.",inv:"Fechamento fora da banda com histograma do MACD acelerando: o intervalo acabou e é tendência."},
+{id:"s4",g:"g-comp",seed:8,title:"Compressão e rompimento verdadeiro",
+ wp:[...SQ,[26,128140,26],[30,128260,30],[34,128215,24],[44,128470,32],[48,128430,26],[53,128540,28]],
+ lead:"As bandas estreitam, o histograma do MACD fica perto de zero e o preço se comprime. O rompimento chega com candle forte e expansão do histograma.",
+ mk:[{t:"avoid",up:1,r:"minBW",w:[8,24],x:"Evitar antecipar: no ponto de maior compressão, a direção ainda não existe. Entrar aqui é adivinhar."},
+ {t:"buy",r:"brkU",w:[22,34],x:"Compra no fechamento acima da banda superior, com corpo grande e histograma do MACD crescendo."},
+ {t:"buy",r:"reclaim9",w:[34,43],x:"Reentrada no pullback à MA9, com a nova tendência de alta em curso."},
+ {t:"avoid",up:1,r:"aboveU",w:[38,50],x:"Evitar comprar esticado: fechamento fora da banda, longe da MA9, depois de uma perna longa."}],
+ ctx:"Largura das bandas bem abaixo da média recente (faixa âmbar), histograma perto de zero.",gat:"Fechamento fora da banda com corpo grande e histograma expandindo.",stp:"Stop na média 20 (ou abaixo do último pullback). Alvo de 2 vezes o risco, com trailing na MA9.",inv:"Preço volta para dentro das bandas em até dois candles."},
+{id:"s5",g:"g-comp",seed:12,title:"Compressão e falso rompimento",
+ wp:[...SQ,[24,128020,8],[26,128100,16],[28,128060,16],[32,127960,20],[42,127830,26],[46,127880,22],[53,127800,26]],
+ lead:"O mesmo começo do cenário anterior, mas o rompimento falha: o preço volta para dentro das bandas, perde a média 20 e segue na direção oposta.",
+ mk:[{t:"avoid",up:1,r:"brkU",w:[22,30],x:"Evitar comprar o rompimento neste caso: o histograma mal expande e a continuação não aparece. Confirmação importa mais que velocidade."},
+ {t:"sell",up:1,r:"lose20",w:[26,36],x:"Venda na perda da média 20, depois do rompimento falho. Stop acima da máxima do falso rompimento."},
+ {t:"avoid",r:"belowL",w:[34,46],x:"Evitar vender no esticado: fechamento fora da banda inferior. O ideal era entrar antes, na perda da média 20."}],
+ ctx:"Compressão seguida de rompimento sem corpo forte e sem expansão do histograma.",gat:"Fechamento de volta abaixo da média 20 após rompimento falho.",stp:"Stop acima da máxima do falso rompimento. Alvo no extremo inferior da compressão e depois na banda inferior.",inv:"Novo fechamento acima da banda superior com histograma crescendo."},
+{id:"s6",g:"g-rev",seed:21,title:"Reversão de topo: divergência no MACD",wp:WP6,
+ lead:"Duas pernas de alta, mas a segunda é mais lenta. O preço faz nova máxima enquanto o MACD faz máxima menor, e depois perde a MA9.",
+ mk:[{t:"avoid",up:1,r:"maxH",w:[8,16],x:"Evitar vender o primeiro topo: momentum forte e histograma ainda acelerando."},
+ {t:"info",up:1,r:"maxH",w:[26,34],x:"Segundo topo: preço sobe mais, mas o pico do MACD é menor. Esta divergência é um alerta, não um gatilho."},
+ {t:"sell",up:1,r:"lose9",w:[30,40],x:"Venda: fechamento abaixo da MA9, de baixa, depois da divergência. Stop acima do segundo topo."},
+ {t:"info",up:1,r:"macdXdn",w:[30,42],x:"Cruzamento do MACD para baixo da linha de sinal: confirmação adicional de perda de força."}],
+ ctx:"Tendência de alta esticada, preço perto da banda superior, histograma do MACD com picos decrescentes.",gat:"Fechamento abaixo da MA9, com histograma do MACD já negativo ou cruzando.",stp:"Stop acima do segundo topo. Alvo na média 20 e depois na banda inferior, com parcial antes.",inv:"Preço retoma a MA9 e rompe o segundo topo com histograma crescendo."},
+{id:"s7",g:"g-rev",seed:22,flip:1,title:"Reversão de fundo: divergência altista no MACD",wp:WP6,
+ lead:"O espelho do cenário anterior. Duas pernas de baixa, com a segunda mais lenta. O preço faz nova mínima, o MACD faz mínima menos profunda, e o preço retoma a MA9.",
+ mk:[{t:"avoid",r:"minL",w:[8,16],x:"Evitar vender o primeiro fundo: a queda ainda tem momentum e o histograma continua aumentando negativamente."},
+ {t:"info",r:"minL",w:[26,34],x:"Segundo fundo: preço cai mais, mas o MACD faz mínima menos profunda. Alerta de exaustão vendedora."},
+ {t:"buy",r:"reclaim9",w:[30,40],x:"Compra: candle de alta que toca e retoma a MA9, depois da divergência. Stop abaixo do segundo fundo."},
+ {t:"info",r:"macdXup",w:[30,42],x:"Cruzamento do MACD para cima da linha de sinal: confirmação adicional."}],
+ ctx:"Tendência de baixa esticada, preço perto da banda inferior, histograma do MACD com mínimas menos profundas.",gat:"Fechamento acima da MA9 em candle de alta, com histograma do MACD já positivo ou cruzando.",stp:"Stop abaixo do segundo fundo. Alvo na média 20 e depois na banda superior, com parcial antes.",inv:"Preço perde a MA9 e o segundo fundo com histograma negativo crescendo."}];
+
+SC.forEach(S=>{S.D=build(S);S.F=S.mk.map(m=>({...m,i:RULE[m.r](S.D,m.w[0],m.w[1])})).filter(m=>m.i>=0)});
+function render(){SC.forEach(S=>{$(S.id+"-c").innerHTML=draw(S)})}
+$("g-tend").innerHTML=$("g-lat").innerHTML=$("g-comp").innerHTML=$("g-rev").innerHTML="";
+const LEG=`<div class="legend"><span><i style="background:#0B1F24"></i>Candles</span><span><i style="background:#F59E0B"></i>MA9</span><span><i style="background:#1565E0"></i>Média 20 e bandas</span><span><i style="background:#00857A"></i>MACD</span><span><i style="background:#E5342A"></i>Sinal</span></div>`;
+SC.forEach(S=>{$(S.g).insertAdjacentHTML("beforeend",`<article class="sc"><h3>${S.title}</h3><p class="lead">${S.lead}</p>${LEG}<div id="${S.id}-c"></div><ol class="mkl">${S.F.map((m,n)=>`<li><span class="b ${m.t}">${m.t=="avoid"?`<span>${n+1}</span>`:n+1}</span><span><b>${{buy:"Compra",sell:"Venda",avoid:"Evitar",info:"Observação"}[m.t]} · ${String(9+Math.floor(m.i/6)).padStart(2,"0")}:${String(m.i%6*10).padStart(2,"0")}.</b> ${m.x}</span></li>`).join("")}</ol><div class="rules"><div><b>Contexto</b>${S.ctx}</div><div><b>Gatilho</b>${S.gat}</div><div><b>Stop e alvo</b>${S.stp}</div><div><b>Invalidação</b>${S.inv}</div></div></article>`)});
+render();
+document.querySelectorAll("#ctl input").forEach(c=>c.addEventListener("change",()=>{OPT[c.dataset.k]=c.checked?1:0;render()}));
+
+/* ---------- Checklist e navegação ---------- */
+const CK=["Qual é o regime no gráfico de 10 minutos: tendência, lateral, compressão ou reversão?","O gatilho que vou usar é compatível com esse regime?","Há confirmação do contexto: S&P, VIX, DXY, EWZ, dólar, DI longo e IFNC?","O alvo está a pelo menos 1,5 vez o stop?","Há dado de alto impacto, almoço ou rolagem de contrato na próxima hora?","Calculei o tamanho da posição pelo risco em reais?","Sei exatamente onde a leitura está errada (invalidação)?"];
+$("chk").innerHTML=CK.map((t,i)=>`<li><input type="checkbox" id="c${i}"><label for="c${i}">${t}</label></li>`).join("");
+const links=[...document.querySelectorAll("nav a")];
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(l=>l.classList.toggle("on",l.getAttribute("href")==="#"+e.target.id))}),{rootMargin:"-30% 0px -60% 0px"});
+document.querySelectorAll("section").forEach(s=>io.observe(s));
+</script>
+</body>
+</html>
