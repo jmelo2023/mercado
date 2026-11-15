@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Renda Variável na Prática: aprenda ações, opções, ETF, BDR, FII e mini contratos</title>
+<meta name="description" content="Educação e aprendizado em renda variável: do básico à automação, com Profit, MetaTrader 5, indicadores, estratégias e análise de mercado.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Sora:wght@600;700;800&display=swap">
+<style>
+:root{--v:#5B21FF;--p:#B320FF;--m:#FF2D8F;--o:#FF9A1F;--c:#00D4FF;--g:#12E39B;--ink:#0B0A2A;--paper:#FFFDF8;--tint:#F1ECFF;--mute:#4B4A6B;
+--d:'Sora',system-ui,sans-serif;--b:'DM Sans',system-ui,sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font:18px/1.6 var(--b);color:var(--ink);background:var(--paper);overflow-x:hidden}
+a{color:inherit}:focus-visible{outline:3px solid var(--o);outline-offset:3px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 5vw}
+.ico{width:1.25em;height:1.25em;vertical-align:-.28em;margin:0 .2em;border-radius:.3em;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+/* topo */
+.top{position:fixed;inset:0 0 auto 0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:12px 5vw;background:rgba(11,10,42,.55);backdrop-filter:blur(12px);color:#fff}
+.logo{font:800 20px var(--d);text-decoration:none;letter-spacing:-.02em}.logo span{color:var(--o)}
+.top nav{display:flex;gap:26px;align-items:center;font-size:15.5px}.top nav a{text-decoration:none;opacity:.9}.top nav a:hover{opacity:1;color:var(--o)}
+.btn{display:inline-flex;align-items:center;gap:10px;font:700 17px var(--d);text-decoration:none;padding:15px 28px;border-radius:999px;border:0;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-3px) scale(1.03)}
+.btn.wa{background:#25D366;color:#06260F;box-shadow:0 10px 28px rgba(37,211,102,.45)}
+.btn.mail{background:#fff;color:var(--v);box-shadow:0 10px 28px rgba(0,0,0,.2)}
+.btn.sm{padding:10px 20px;font-size:15px}
+/* hero */
+.hero{position:relative;color:#fff;padding:150px 0 110px;background:linear-gradient(135deg,#4B14F0 0%,#A41BFF 38%,#FF2D8F 72%,#FF9A1F 100%);overflow:hidden}
+.hero:before,.hero:after{content:"";position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;animation:drift 12s ease-in-out infinite alternate}
+.hero:before{width:480px;height:480px;background:#00D4FF;left:-140px;top:60px}.hero:after{width:420px;height:420px;background:#FFD23F;right:-100px;bottom:-120px;animation-delay:-5s}
+@keyframes drift{to{transform:translate(60px,-40px) scale(1.15)}}
+.hg{position:relative;z-index:1;display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center}
+.eyebrow{display:inline-block;font:700 14px var(--d);letter-spacing:.12em;text-transform:uppercase;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);padding:8px 16px;border-radius:999px;margin-bottom:22px}
+h1{font:800 clamp(40px,6vw,78px)/1.02 var(--d);letter-spacing:-.03em;margin:0 0 22px}
+h1 em{font-style:normal;background:linear-gradient(90deg,#FFE96B,#12E39B);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.l{font-size:clamp(19px,2vw,23px);max-width:34em;margin:0 0 32px;color:#FFF3FA}
+.cta{display:flex;gap:16px;flex-wrap:wrap}
+.chart{position:relative;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.45);backdrop-filter:blur(10px);border-radius:28px;padding:22px;box-shadow:0 30px 80px rgba(20,0,80,.45)}
+.chart h2{font:700 14px var(--d);margin:0 0 6px;letter-spacing:.08em;text-transform:uppercase;color:#fff}
+.chart svg{width:100%;height:auto;display:block}
+.cd{transform-box:fill-box;transform-origin:center bottom;animation:pop .7s both}@keyframes pop{from{transform:scaleY(0);opacity:0}}
+.ln{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 2.4s .9s forwards}@keyframes draw{to{stroke-dashoffset:0}}
+.fl{position:absolute;font:700 14px var(--d);padding:8px 14px;border-radius:999px;color:#fff;box-shadow:0 10px 24px rgba(0,0,0,.3);animation:fl 5s ease-in-out infinite alternate}
+@keyframes fl{to{transform:translateY(-14px) rotate(-2deg)}}
+/* faixa */
+.band{background:var(--ink);color:#fff;overflow:hidden;white-space:nowrap;padding:18px 0;border-block:4px solid var(--o)}
+.band div{display:inline-block;animation:mq 28s linear infinite;font:800 22px var(--d);letter-spacing:.04em}
+.band span{margin:0 26px}.band i{font-style:normal;color:var(--m)}
+@keyframes mq{to{transform:translateX(-50%)}}
+/* seções */
+section{padding:96px 0}
+.kick{font:700 14px var(--d);letter-spacing:.14em;text-transform:uppercase;color:var(--m);margin:0 0 10px}
+h2.t{font:800 clamp(32px,4.4vw,54px)/1.08 var(--d);letter-spacing:-.025em;margin:0 0 16px;max-width:20em}
+.sub{font-size:20px;color:var(--mute);max-width:46em;margin:0 0 48px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:-56px;position:relative;z-index:2}
+.stat{background:#fff;border-radius:22px;padding:24px;box-shadow:0 18px 50px rgba(91,33,255,.18);text-align:center}
+.stat b{display:block;font:800 clamp(34px,4vw,52px)/1 var(--d);background:linear-gradient(90deg,var(--v),var(--m));-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat span{font-size:16px;color:var(--mute)}
+.assets{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.as{position:relative;border-radius:26px;padding:26px;color:#fff;min-height:230px;overflow:hidden;transition:transform .25s}
+.as:hover{transform:translateY(-8px) rotate(-.6deg)}
+.as:after{content:"";position:absolute;right:-40px;bottom:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.2)}
+.as h3{font:800 28px var(--d);margin:0 0 8px;letter-spacing:-.02em}.as p{margin:0 0 14px;font-size:16.5px;max-width:19em}
+.as code{font:700 13.5px var(--d);background:rgba(0,0,0,.25);padding:4px 10px;border-radius:999px}
+.as.big{grid-column:span 2}
+/* roteiro */
+.road{background:var(--ink);color:#fff;position:relative}
+.road .sub{color:#C9C7F0}
+.tl{position:relative;display:grid;gap:14px;max-width:1000px}
+.tl:before{content:"";position:absolute;left:35px;top:20px;bottom:20px;width:4px;border-radius:4px;background:linear-gradient(var(--c),var(--v),var(--m),var(--o))}
+.mod{position:relative;margin-left:0;border-radius:22px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);transition:background .2s}
+.mod[open]{background:rgba(255,255,255,.13)}
+.mod summary{display:grid;grid-template-columns:74px 1fr 30px;gap:12px;align-items:center;padding:16px 20px 16px 8px;cursor:pointer;list-style:none}
+.mod summary::-webkit-details-marker{display:none}
+.num{position:relative;z-index:1;width:56px;height:56px;margin-left:8px;border-radius:50%;display:grid;place-items:center;font:800 24px var(--d);color:#fff;box-shadow:0 0 0 6px var(--ink)}
+.mod h3{font:700 clamp(18px,2.1vw,24px)/1.25 var(--d);margin:0}
+.mod .s{display:block;font-size:16px;color:#C9C7F0;margin-top:2px}
+.chev{font:700 26px var(--d);transition:transform .25s;color:var(--o)}.mod[open] .chev{transform:rotate(45deg)}
+.mod ul{margin:0;padding:4px 28px 24px 98px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px 26px;list-style:none}
+.mod li{position:relative;padding-left:22px;font-size:16.5px;color:#EDEBFF}
+.mod li:before{content:"";position:absolute;left:0;top:.6em;width:10px;height:10px;border-radius:3px;background:var(--g);transform:rotate(45deg)}
+.hl{border-color:var(--o)!important;box-shadow:0 0 0 2px rgba(255,154,31,.4),0 20px 50px rgba(255,154,31,.15)}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 22px}
+.tools button{font:700 15px var(--d);background:transparent;color:#fff;border:2px solid rgba(255,255,255,.5);border-radius:999px;padding:9px 18px;cursor:pointer}
+.tools button:hover{background:#fff;color:var(--ink)}
+/* plataformas */
+.plat{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.pc{border-radius:30px;padding:36px;color:#fff;position:relative;overflow:hidden}
+.pc.a{background:linear-gradient(135deg,#00B86B,#00C2E0)}.pc.b{background:linear-gradient(135deg,#1B3FD6,#7A2CFF)}
+.pc .big{width:84px;height:84px;border-radius:22px;box-shadow:0 12px 30px rgba(0,0,0,.3);margin-bottom:16px;display:block}
+.pc h3{font:800 34px var(--d);margin:0 0 10px;letter-spacing:-.02em}.pc ul{margin:0;padding-left:20px}.pc li{margin:6px 0}
+/* publico / indicadores */
+.who{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.wc{background:var(--tint);border-radius:26px;padding:30px;border-bottom:8px solid var(--v)}
+.wc:nth-child(2){border-color:var(--m)}.wc:nth-child(3){border-color:var(--o)}
+.wc h3{font:800 24px var(--d);margin:0 0 8px}.wc p{margin:0;color:var(--mute)}
+.ind{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.ind span{font:700 17px var(--d);padding:12px 22px;border-radius:999px;color:#fff}
+/* materiais */
+.mats{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.mt{display:block;text-decoration:none;border-radius:26px;padding:28px;background:#fff;border:3px solid var(--tint);transition:.25s}
+.mt:hover{border-color:var(--m);transform:translateY(-6px);box-shadow:0 20px 40px rgba(255,45,143,.2)}
+.mt b{display:block;font:800 22px var(--d);margin-bottom:6px}.mt span{color:var(--mute);font-size:16.5px}.mt i{display:block;margin-top:14px;font:700 15px var(--d);font-style:normal;color:var(--m)}
+/* contato */
+.contact{background:linear-gradient(135deg,#FF9A1F,#FF2D8F 45%,#5B21FF);color:#fff;text-align:center}
+.contact h2{margin-inline:auto}.contact .sub{margin-inline:auto;color:#FFF3FA}
+.chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:0 0 28px}
+.chips button{font:700 15.5px var(--d);padding:10px 20px;border-radius:999px;border:2px solid #fff;background:transparent;color:#fff;cursor:pointer}
+.chips button[aria-pressed=true]{background:#fff;color:var(--v)}
+.cbox{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+.cinfo{margin-top:28px;font:700 20px var(--d)}.cinfo a{text-decoration:none;border-bottom:3px solid rgba(255,255,255,.6)}
+footer{background:var(--ink);color:#B9B7E0;padding:40px 0;font-size:14.5px}
+footer p{max-width:100ch;margin:0 0 10px}
+.fwa{position:fixed;right:18px;bottom:18px;z-index:60;display:flex;align-items:center;gap:10px;background:#25D366;color:#06260F;font:700 16px var(--d);padding:14px 20px;border-radius:999px;text-decoration:none;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:pulse 2.2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(37,211,102,.7),0 10px 30px rgba(0,0,0,.35)}70%{box-shadow:0 0 0 18px rgba(37,211,102,0),0 10px 30px rgba(0,0,0,.35)}100%{box-shadow:0 0 0 0 rgba(37,211,102,0),0 10px 30px rgba(0,0,0,.35)}}
+.rv{opacity:0;transform:translateY(30px);transition:opacity .7s,transform .7s}.rv.in{opacity:1;transform:none}
+@media(max-width:960px){.hg,.plat,.who,.mats{grid-template-columns:1fr}.assets{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}.top nav a:not(.btn){display:none}.hero{padding:120px 0 90px}.fl{display:none}.mod ul{grid-template-columns:1fr;padding-left:28px}.as.big{grid-column:span 2}}
+@media(max-width:560px){.assets{grid-template-columns:1fr}.as.big{grid-column:auto}.fwa span{display:none}.fwa{padding:16px}.mod summary{grid-template-columns:64px 1fr 24px}.num{width:48px;height:48px;font-size:20px}.tl:before{left:31px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}.ln{stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="gP" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00C853"/><stop offset="1" stop-color="#00B8D4"/></linearGradient>
+<linearGradient id="gM" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2A5BFF"/><stop offset="1" stop-color="#0B2A8A"/></linearGradient></defs>
+<!-- Ícones ilustrativos. Para usar os logos oficiais, troque cada <svg class="ico"> por <img class="ico" src="logo.png" alt="Profit"> -->
+<symbol id="i-profit" viewBox="0 0 48 48"><rect width="48" height="48" rx="11" fill="url(#gP)"/><path d="M10 34 19 24l6 5 13-15" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 14h8v8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-mt5" viewBox="0 0 48 48"><rect width="48" height="48" rx="11" fill="url(#gM)"/><path d="M9 36h30" stroke="#8FB0FF" stroke-width="3" stroke-linecap="round"/><text x="24" y="30" font-size="19" font-weight="800" fill="#fff" text-anchor="middle" font-family="Sora,Arial,sans-serif">MT5</text></symbol>
+<symbol id="i-wa" viewBox="0 0 24 24"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></symbol>
+</svg>
+
+<header class="top">
+<a class="logo" href="#topo">Renda Variável <span>na Prática</span></a>
+<nav><a href="#ativos">Ativos</a><a href="#roteiro">Roteiro</a><a href="#plataformas">Plataformas</a><a href="#materiais">Materiais</a><a class="btn wa sm" href="#contato">Falar agora</a></nav>
+</header>
+
+<div class="hero" id="topo"><div class="wrap hg">
+<div>
+<span class="eyebrow">Educação em renda variável</span>
+<h1>Aprenda a investir e operar na bolsa, <em>do zero à automação</em></h1>
+<p class="l">Ações, opções, ETFs, BDRs, FIIs e mini contratos de índice e dólar, em um roteiro de 10 módulos que une teoria, prática nas plataformas e leitura de mercado.</p>
+<div class="cta"><a class="btn wa" id="wa1" href="#"><svg width="26" height="26"><use href="#i-wa"/></svg>Chamar no WhatsApp</a><a class="btn mail" href="#roteiro">Ver o roteiro</a></div>
+</div>
+<div class="chart"><h2>Gráfico ilustrativo · 10 min</h2>
+<svg id="hc" viewBox="0 0 420 270" role="img" aria-label="Gráfico ilustrativo de candles com média móvel"></svg>
+<span class="fl" style="left:-26px;top:30px;background:#FF2D8F">WIN</span><span class="fl" style="right:-14px;top:-22px;background:#00B8D4;animation-delay:-1.5s">WDO</span><span class="fl" style="right:-24px;bottom:56px;background:#12B981;animation-delay:-3s">FII</span><span class="fl" style="left:20px;bottom:-22px;background:#FF9A1F;animation-delay:-2s">OPÇÕES</span>
+</div></div></div>
+
+<div class="band" aria-hidden="true"><div><span>AÇÕES <i>●</i></span><span>OPÇÕES <i>●</i></span><span>ETF <i>●</i></span><span>BDR <i>●</i></span><span>FII <i>●</i></span><span>MINI ÍNDICE <i>●</i></span><span>MINI DÓLAR <i>●</i></span><span>AÇÕES <i>●</i></span><span>OPÇÕES <i>●</i></span><span>ETF <i>●</i></span><span>BDR <i>●</i></span><span>FII <i>●</i></span><span>MINI ÍNDICE <i>●</i></span><span>MINI DÓLAR <i>●</i></span></div></div>
+
+<div class="wrap"><div class="stats rv">
+<div class="stat"><b>10</b><span>módulos, do básico à automação</span></div>
+<div class="stat"><b>7</b><span>classes de ativos estudadas</span></div>
+<div class="stat"><b>2</b><span>plataformas: <svg class="ico"><use href="#i-profit"/></svg>Profit e <svg class="ico"><use href="#i-mt5"/></svg>MT5</span></div>
+<div class="stat"><b>5</b><span>indicadores técnicos a fundo</span></div>
+</div></div>
+
+<section id="ativos"><div class="wrap">
+<p class="kick">O que você vai aprender</p>
+<h2 class="t rv">Sete mercados, uma base sólida</h2>
+<p class="sub rv">Cada classe de ativo tem lógica, riscos e ferramentas próprias. Você aprende a diferença entre elas e quando cada uma faz sentido para o seu perfil.</p>
+<div class="assets">
+<div class="as big rv" style="background:linear-gradient(135deg,#5B21FF,#B320FF)"><h3>Ações</h3><p>Participação em empresas listadas na B3: como são precificadas, o que move o preço e como analisar.</p><code>PETR4 · VALE3 · ITUB4</code></div>
+<div class="as big rv" style="background:linear-gradient(135deg,#FF2D8F,#FF7A59)"><h3>Opções</h3><p>Direitos de compra e venda usados para proteção, renda e estratégias estruturadas, como a Wheel.</p><code>CALL · PUT · TRAVAS</code></div>
+<div class="as rv" style="background:linear-gradient(135deg,#00B8D4,#2A5BFF)"><h3>ETFs</h3><p>Fundos negociados em bolsa que replicam índices.</p><code>BOVA11 · IVVB11</code></div>
+<div class="as rv" style="background:linear-gradient(135deg,#FF9A1F,#FF4D4D)"><h3>BDRs</h3><p>Recibos de ações de empresas estrangeiras negociados na B3.</p><code>AAPL34 · MSFT34</code></div>
+<div class="as rv" style="background:linear-gradient(135deg,#12B981,#0EA5E9)"><h3>FIIs</h3><p>Fundos imobiliários que distribuem rendimentos.</p><code>HGLG11 · MXRF11</code></div>
+<div class="as rv" style="background:linear-gradient(135deg,#7A2CFF,#FF2D8F)"><h3>Mini índice</h3><p>Contrato futuro do Ibovespa para operações de curto prazo.</p><code>WIN</code></div>
+<div class="as big rv" style="background:linear-gradient(135deg,#0B0A2A,#5B21FF)"><h3>Mini dólar</h3><p>Contrato futuro de dólar: fluxo cambial, juros, risco-país e gestão rigorosa de risco.</p><code>WDO</code></div>
+<div class="as big rv" style="background:linear-gradient(135deg,#FFC400,#FF7A00);color:#2A1500"><h3>Exemplos, não recomendações</h3><p>Os ativos citados servem para ilustrar o estudo. O foco é o método, não a indicação de compra ou venda.</p></div>
+</div></div></section>
+
+<section class="road" id="roteiro"><div class="wrap">
+<p class="kick" style="color:var(--o)">Roteiro de aprendizado</p>
+<h2 class="t rv">10 módulos para sair do zero e operar com critério</h2>
+<p class="sub rv">Cada módulo constrói sobre o anterior. Toque em um módulo para ver o conteúdo.</p>
+<div class="tools"><button type="button" id="ex">Expandir todos</button><button type="button" id="co">Recolher todos</button></div>
+<div class="tl" id="tl"></div>
+</div></section>
+
+<section id="plataformas"><div class="wrap">
+<p class="kick">Plataformas</p>
+<h2 class="t rv">Prática passo a passo nas ferramentas que o mercado usa</h2>
+<p class="sub rv">Do primeiro gráfico à ordem enviada e à automação, você aprende a configurar e operar nas duas plataformas.</p>
+<div class="plat">
+<div class="pc a rv"><svg class="big"><use href="#i-profit"/></svg><h3>Profit</h3><ul><li>Instalação, login e conexão com a corretora</li><li>Gráficos, templates e indicadores</li><li>Book de ofertas, times &amp; trades e boleta</li><li>Ordens com stop e gerenciamento de posição</li></ul></div>
+<div class="pc b rv"><svg class="big"><use href="#i-mt5"/></svg><h3>MetaTrader 5</h3><ul><li>Conta, símbolos e Market Watch</li><li>Gráficos, indicadores e templates</li><li>Envio de ordens e gestão de risco</li><li>Expert Advisors e testador de estratégias</li></ul></div>
+</div></div></section>
+
+<section style="background:var(--tint)"><div class="wrap">
+<p class="kick">Para quem é</p>
+<h2 class="t rv">Do primeiro investimento ao robô</h2>
+<div class="who" style="margin-top:36px">
+<div class="wc rv"><h3>Quem está começando</h3><p>Entende como a bolsa funciona, os riscos reais e como abrir conta e dar os primeiros passos com segurança.</p></div>
+<div class="wc rv"><h3>Quem já investe</h3><p>Aprende a diversificar, proteger a carteira e escolher entre buy and hold, swing trade e day trade.</p></div>
+<div class="wc rv"><h3>Quem quer evoluir</h3><p>Domina indicadores, estratégias, leitura de índices e notícias, e conhece a automação com robôs.</p></div>
+</div>
+<div class="ind rv"><span style="background:#5B21FF">Médias móveis</span><span style="background:#FF2D8F">Bandas de Bollinger</span><span style="background:#00A6C7">RSI</span><span style="background:#FF8A00">MACD</span><span style="background:#12B981">ADX</span></div>
+</div></section>
+
+<section id="materiais"><div class="wrap">
+<p class="kick">Conheça o conteúdo</p>
+<h2 class="t rv">Amostras do material</h2>
+<p class="sub rv">Veja como o conteúdo é construído, com exemplos gráficos e leitura de mercado.</p>
+<div class="mats">
+<a class="mt rv" href="index.html"><b>Guia intermercados</b><span>O que move o Ibovespa e o dólar, cronograma do pregão e calendário econômico.</span><i>Abrir guia →</i></a>
+<a class="mt rv" href="daytrade.html"><b>Day trade no WIN e no WDO</b><span>Contrato, tickers e vencimentos, intermercados, setups e gestão de risco.</span><i>Abrir guia →</i></a>
+<a class="mt rv" href="laboratorio.html"><b>Laboratório visual</b><span>Bollinger, MA9 e MACD em 10 minutos, com pontos de compra, venda e o que evitar.</span><i>Abrir laboratório →</i></a>
+</div></div></section>
+
+<section class="contact" id="contato"><div class="wrap">
+<p class="kick" style="color:#fff">Vamos conversar</p>
+<h2 class="t">Quer saber como funciona e começar a aprender?</h2>
+<p class="sub">Escolha o que mais te interessa e chame no WhatsApp. A mensagem já vai pronta.</p>
+<div class="chips" id="chips"></div>
+<div class="cbox"><a class="btn wa" id="wa2" href="#"><svg width="26" height="26"><use href="#i-wa"/></svg>Chamar no WhatsApp</a><a class="btn mail" href="mailto:jmelo21@gmail.com?subject=Renda%20Vari%C3%A1vel%20na%20Pr%C3%A1tica">Enviar e-mail</a></div>
+<p class="cinfo">WhatsApp <a href="https://wa.me/5581991676220">(81) 99167-6220</a><br>E-mail <a href="mailto:jmelo21@gmail.com">jmelo21@gmail.com</a></p>
+</div></section>
+
+<footer><div class="wrap">
+<p>Conteúdo educacional. Não constitui recomendação de investimento, análise de valores mobiliários nem promessa de resultado. Renda variável envolve risco de perda, inclusive de todo o capital investido, e derivativos e mini contratos podem gerar perdas superiores ao valor aplicado.</p>
+<p>Profit e MetaTrader 5 são marcas de seus respectivos proprietários. Os ícones exibidos nesta página são ilustrativos.</p>
+</div></footer>
+
+<a class="fwa" id="wa3" href="#" aria-label="Chamar no WhatsApp"><svg width="26" height="26"><use href="#i-wa"/></svg><span>WhatsApp</span></a>
+
+<script>
+const $=id=>document.getElementById(id);
+const PF='<svg class="ico"><use href="#i-profit"/></svg>',MT='<svg class="ico"><use href="#i-mt5"/></svg>';
+const COR=["#5B21FF","#B320FF","#FF2D8F","#FF5A5F","#FF9A1F","#E6B800","#12B981","#00B8D4","#2A5BFF","#7A2CFF"];
+const MOD=[
+["O que é o mercado de renda variável","Bolsa, ativos e formação de preço",["Bolsa de valores, B3 e como os preços se formam","Diferença entre renda fixa e renda variável","Classes de ativos: ações, opções, ETF, BDR, FII e futuros","Participantes, horários de negociação e custos"]],
+["Potencialidades e riscos","Retorno potencial e perda possível",["Retorno, volatilidade e expectativas realistas","Risco de mercado, de liquidez e de alavancagem","Psicologia do investidor: medo, ganância e disciplina","Por que muitos perdem e como se preparar"]],
+["Proteção e diversificação","Como não depender de um único resultado",["Diversificação entre classes, setores e países","Tamanho de posição e risco por operação","Stop, realização parcial e plano de saída","Proteção com opções e ETFs"]],
+["Buy and hold, swing trade e day trade","Três horizontes, três rotinas",["Perfil, tempo disponível e objetivo de cada estilo","Custos, impostos e riscos de cada abordagem","Quando cada estilo faz sentido","Montando uma rotina compatível com a sua vida"]],
+["Como escolher e abrir conta numa corretora","Critérios e passo a passo",["O que comparar: custos, plataforma, atendimento e segurança","Como verificar se a corretora é autorizada","Abertura de conta, perfil de investidor e primeiros aportes","Cuidados com golpes e promessas irreais"]],
+[`Passo a passo no uso de plataformas: ${PF}Profit e ${MT}MetaTrader 5`,"Da instalação à primeira ordem",["Instalação, login e conexão com a corretora","Gráficos, templates, indicadores e alertas","Boleta, book de ofertas, stop e gestão de posição","No MetaTrader 5: Market Watch, ordens e Expert Advisors"]],
+["Estudo de indicadores","Médias móveis, Bandas de Bollinger, RSI, MACD e ADX",["Como cada indicador é calculado e o que ele mede","Parâmetros e uso em diferentes tempos gráficos","Armadilhas e falsos sinais","Combinação por regime: tendência, lateralidade e reversão"]],
+["Estratégias de operação","Do setup ao plano de trade",["Tendência, pullback, rompimento e reversão","Gatilho, stop, alvo e relação risco/retorno","Plano de trade e diário de operações","Avaliação de resultados sem se enganar"]],
+["Uso de robôs e automação","De regras objetivas ao robô em execução",["O que dá para automatizar e o que não dá","Transformando uma estratégia em regras objetivas","Backtest, otimização e o risco de overfitting",`Robôs no ${MT}MetaTrader 5, execução e monitoramento`]],
+["Análise dos principais índices e notícias","O que olhar para cada ativo",["S&P 500, VIX, DXY, EWZ, IFNC e commodities","Juros futuros (DI), dólar e risco-país","Calendário: payroll, CPI, FOMC, Copom e IPCA","Ações, opções, FIIs, BDRs, WIN e WDO: o que acompanhar em cada um"]]];
+$("tl").innerHTML=MOD.map((m,i)=>`<details class="mod rv${i==5?" hl":""}"${i==0?" open":""}><summary><span class="num" style="background:${COR[i]}">${i+1}</span><span><h3>${m[0]}</h3><span class="s">${m[1]}</span></span><span class="chev">+</span></summary><ul>${m[2].map(x=>`<li>${x}</li>`).join("")}</ul></details>`).join("");
+$("ex").onclick=()=>document.querySelectorAll(".mod").forEach(d=>d.open=true);
+$("co").onclick=()=>document.querySelectorAll(".mod").forEach(d=>d.open=false);
+
+/* candles do hero */
+const cl=[40,46,44,52,58,55,63,70,66,74,82,78,88,95,91,102],W=420,st=W/(cl.length+1);let g="",e=cl[0],pts=[];
+const Y=v=>250-v*2.1;
+cl.forEach((c,i)=>{const o=i?cl[i-1]:c-4,h=Math.max(o,c)+5,l=Math.min(o,c)-5,x=st*(i+1),col=c>=o?"#12E39B":"#FFE96B";
+ g+=`<g class="cd" style="animation-delay:${i*.09}s"><line x1="${x}" x2="${x}" y1="${Y(h)}" y2="${Y(l)}" stroke="${col}" stroke-width="2"/><rect x="${x-6}" y="${Y(Math.max(o,c))}" width="12" height="${Math.max(3,Math.abs(Y(o)-Y(c)))}" rx="2" fill="${col}"/></g>`;
+ e=i?e+(c-e)*.35:c;pts.push((i?"L":"M")+x.toFixed(1)+" "+Y(e-3).toFixed(1))});
+$("hc").innerHTML=`<path d="M0 252H420" stroke="rgba(255,255,255,.35)"/>`+g+`<path class="ln" pathLength="1" d="${pts.join("")}" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`;
+
+/* WhatsApp com mensagem pronta */
+const INT=["Ações","Opções","ETF, BDR e FII","Day trade (WIN e WDO)","Profit e MetaTrader 5","Robôs e automação"],SEL=new Set();
+$("chips").innerHTML=INT.map(t=>`<button type="button" aria-pressed="false">${t}</button>`).join("");
+function wa(){let m="Olá! Vim pela página de Renda Variável na Prática e quero saber mais sobre o aprendizado.";if(SEL.size)m+=" Tenho interesse em: "+[...SEL].join(", ")+".";
+ const u="https://wa.me/5581991676220?text="+encodeURIComponent(m);["wa1","wa2","wa3"].forEach(i=>{$(i).href=u;$(i).target="_blank";$(i).rel="noopener"})}
+document.querySelectorAll("#chips button").forEach(b=>b.onclick=()=>{const t=b.textContent,on=!SEL.has(t);on?SEL.add(t):SEL.delete(t);b.setAttribute("aria-pressed",on);wa()});wa();
+
+/* revelar ao rolar */
+const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add("in");io.unobserve(x.target)}}),{threshold:.12});
+document.querySelectorAll(".rv").forEach(x=>io.observe(x));
+</script>
+</body>
+</html>
