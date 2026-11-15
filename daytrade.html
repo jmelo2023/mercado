@@ -92,6 +92,20 @@ body.noscroll{overflow:hidden}
 }
 @media(prefers-reduced-motion:reduce){nav,.nav-bg,.menu-btn i{transition:none}}
 @media print{.menu-btn,.nav-bg{display:none!important}}
+
+.cta-top{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;margin:0 0 20px;padding:22px 28px;border-radius:20px;color:#fff;background:linear-gradient(120deg,#5B21FF 0%,#B320FF 35%,#FF2D8F 70%,#FF9A1F 100%);box-shadow:0 14px 40px rgba(91,33,255,.35)}
+.cta-top:before{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg);animation:ctaShine 3.6s infinite}
+@keyframes ctaShine{0%{left:-60%}60%,100%{left:130%}}
+.cta-top div{position:relative;max-width:60ch}
+.cta-top b{display:block;font:800 clamp(20px,2.4vw,28px)/1.2 var(--serif);margin-bottom:4px}
+.cta-top span{font-size:16.5px;color:#FFF3FA}
+.cta-btn{position:relative;display:inline-flex;align-items:center;gap:10px;background:#FFE400;color:#2A1500;text-decoration:none;font:800 18px/1 var(--sans);padding:17px 28px;border-radius:999px;box-shadow:0 0 0 0 rgba(255,228,0,.8),0 10px 24px rgba(0,0,0,.3);animation:ctaPulse 2s infinite;transition:transform .2s}
+.cta-btn:hover{transform:translateY(-3px) scale(1.04);color:#2A1500}
+.cta-btn i{font-style:normal;font-size:22px}
+@keyframes ctaPulse{70%{box-shadow:0 0 0 16px rgba(255,228,0,0),0 10px 24px rgba(0,0,0,.3)}100%{box-shadow:0 0 0 0 rgba(255,228,0,0),0 10px 24px rgba(0,0,0,.3)}}
+@media(max-width:900px){.cta-top{padding:20px 18px;margin-top:44px}.cta-btn{width:100%;justify-content:center}}
+@media(prefers-reduced-motion:reduce){.cta-top:before,.cta-btn{animation:none}}
+@media print{.cta-top{display:none}}
 </style>
 </head>
 <body>
@@ -318,7 +332,8 @@ Tópicos do guia:
 <section id="plano">
 <h2>7. Plano e checklist</h2>
 <p class="sub">Marque os itens conforme avança. A marcação não é salva.</p>
-<ul class="check" id="chk"></ul>
+<ul class="check" id="chk"></ul><br>
+<aside class="cta-top"><div><b>Quer dominar este conteúdo na prática?</b><span>Aprenda renda variável do zero à automação: ações, opções, ETF, BDR, FII e mini contratos de índice e dólar.</span></div><a class="cta-btn" href="educacao-renda-variavel.html">Conheça o roteiro de aprendizado <i>→</i></a></aside>
 <footer><h3>Material educacional, sem recomendação de compra ou venda. Todos os valores de exemplo são hipotéticos. Day trade com derivativos envolve risco elevado de perda, inclusive acima do capital alocado. Confira as especificações do contrato, horários e margens vigentes na B3 e na sua corretora antes de operar.</h3></footer>
 </section>
 </main>
